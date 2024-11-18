@@ -1,0 +1,2039 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[left=1.0in, top=1.0in, bottom=1.0in, right=1.0in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{bbm, bm}                     % blackboard and bold fonts
+\usepackage{mathtools}                   % provides starred version of bmatrix. loads amsmath
+\usepackage{float}                       % more exact placement of figures
+\usepackage{array}                       % justification of fixed-width columns & matrices
+\usepackage{arydshln}                    % dashed lines in matrices
+\usepackage{titlesec}                    % change title formats
+\usepackage[most, breakable]{tcolorbox}  % nicely colored boxes (most allows for no frames)
+\usepackage[shortlabels]{enumitem}       % change enumerate symbols
+\usepackage{nicefrac}                    % small in-line fractions
+\usepackage{booktabs}                    % nice table properties, e.g. toprule & bottomrule
+\usepackage{wasysym}                     % larger set of glyphs for, e.g. binary relations
+\usepackage[bottom]{footmisc}            % put footnote in environment at bottom of page
+\usepackage{threeparttable}              % notes at the table
+% \usepackage[capposition=top]{floatrow}   % `floatfoot` command for figure notes
+
+\usepackage{tikz}       % drawing stuff
+\usetikzlibrary{matrix} % drawing matrices
+
+\usepackage{stackengine, scalerel} % adding some padding in fractions
+
+\usepackage{siunitx}
+\sisetup{
+    per-mode = symbol,
+    output-decimal-marker = {.},
+    % group-minimum-digits = 4,
+    input-symbols = (),
+    range-units = brackets,
+    list-final-separator = { \translate{and} },
+    list-pair-separator = { \translate{and} },
+    range-phrase = { \translate{to (numerical range)} },
+}
+
+%-- enumerate options
+\setlist{
+    listparindent=\parindent,
+    parsep=0pt
+}
+
+
+% trinidad colors
+\definecolor{tgreen}{RGB}{57, 115, 82}
+\definecolor{tlightgreen}{RGB}{121, 217, 163}
+\definecolor{tmarigold}{RGB}{242, 159, 5}
+\definecolor{torange}{RGB}{217, 103, 4}
+\definecolor{tred}{RGB}{115, 32, 2}
+\definecolor{tcoral}{RGB}{242, 121, 131}
+\definecolor{tblue}{RGB}{12, 99, 102}
+\definecolor{tlightblue}{RGB}{20, 161, 166}
+\definecolor{tlava}{RGB}{73, 65, 55}
+\definecolor{tcoffee}{RGB}{58, 48, 45}
+
+
+
+\titleformat{\section}
+    {\large\scshape}{\thesection}{1em}{}
+\titleformat{\subsection}
+    {\large\scshape}{\thesubsection}{1em}{}
+
+% allows equation and align environments to break over pages
+\allowdisplaybreaks
+
+% faster way of writing a norm
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+%vectors with angle, parenthesis, & bracket delimiters
+\newcommand\avec[1]{\left\langle#1\right\rangle}
+\newcommand\pvec[1]{\left(#1\right)}
+\newcommand\bvec[1]{\left[#1\right]}
+
+% argmin and argmax operators
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+% shortening varepsilon
+\newcommand\ve{\varepsilon}
+
+% shortening common bold-faced letters and variance
+\newcommand\E{\mathbb{E}}
+\newcommand\R{\mathbb{R}}
+\newcommand\Var{\text{Var}}
+\newcommand\Cov{\text{Cov}}
+\renewcommand\P{\mathbb{P}} % \P is the paragraph symbol by default
+
+\newcommand\cF{\mathcal{F}}
+
+% succsim & precsim with slashes through it
+%   https://tex.stackexchange.com/a/479194
+\makeatletter
+\newcommand\nsuccsim{\mathrel{\mathpalette\varn@t\succsim}}
+\newcommand\nprecsim{\mathrel{\mathpalette\varn@t\precsim}}
+\newcommand\varn@t[2]{%
+    \vphantom{/{#2}}%
+    \ooalign{\hfil$\m@th#1/\mkern2mu$\cr\hfil$\m@th#1#2$\hfil\cr}%
+}
+\makeatother
+
+% partial derivatives
+\newcommand\dd[2]{\frac{\partial#1}{\partial#2}}
+\newcommand\ndd[2]{\nicefrac{\partial#1}{\partial#2}}
+
+\stackMath
+\newcommand\tdd[3][1pt]{\tfrac{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle\partial#2}}}{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle\partial#3}}%
+}}
+
+% spaced fraction
+\stackMath
+\newcommand\sfrac[3][1pt]{\tfrac{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle#2}}}{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle#3}}%
+}}
+
+% decreases space between tilde and character its above
+\newcommand\stilde[1]{\smash{\tilde{#1}}}
+
+% label one equation in align
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% making smaller bullets in itemize environments
+\newlength{\mylen}
+\setbox1=\hbox{$\bullet$}\setbox2=\hbox{\tiny$\bullet$}
+\setlength{\mylen}{\dimexpr0.5\ht1-0.5\ht2}
+
+% fixed-width, aligned column types
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+% environments for questions and answers
+\newcounter{question}[section]
+\NewDocumentEnvironment{hwquestion}{o}
+    {
+        \refstepcounter{question}
+        \begin{tcolorbox}[
+            colback=tlightgreen,
+            colframe=tgreen,
+            opacityback=0.25,
+            title=\IfNoValueTF{#1}
+                {Question~\thequestion}
+                {Question~\thequestion \, - #1},
+            breakable,
+            enhanced jigsaw,
+            before upper={\parindent15pt} %-- add paragraph indents
+        ]
+    }
+    {
+        \end{tcolorbox}
+    }
+\newcounter{subquestion}[question]
+\NewDocumentEnvironment{hwsubquestion}{o}
+    {
+        \refstepcounter{subquestion}
+        \begin{tcolorbox}[
+            colback=tlightgreen,
+            colframe=tgreen,
+            opacityback=0.25,
+            title=\IfNoValueTF{#1}
+                {Question~\thequestion.\thesubquestion}
+                {Question~\thequestion.\thesubquestion \, - #1},
+            breakable,
+            enhanced jigsaw,
+            before upper={\parindent15pt} %-- add paragraph indents
+        ]
+    }
+    {
+        \end{tcolorbox}
+    }
+\newenvironment{hwanswer}
+    {
+        \vspace{2mm}
+        {\bfseries Answer}
+        \vspace{-\abovedisplayskip}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\textwidth,
+                colback=white,
+                colframe=white,
+                opacityback=0,
+                opacityframe=0,
+                boxrule=0pt,
+                frame hidden,
+                breakable,
+                before upper={\parindent15pt} %-- add paragraph indents
+            ]
+            \lineskip=0pt % smashes inline math to same line spacing
+    }
+    {
+        \end{tcolorbox}
+        \end{center}
+        \vspace{4mm}
+    }
+\newenvironment{hwquestiongroup}[1][\unskip]
+    {
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.90\linewidth,
+                colback=torange,
+                colframe=torange,
+                opacityback=0.25,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+\newenvironment{hwlemma}[1][\unskip]
+    {
+        \vspace{1mm}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\linewidth,
+                colback=tmarigold,
+                colframe=tmarigold,
+                opacityback=0.10,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+\newenvironment{hwdefinition}[1][\unskip]
+    {
+        \vspace{1mm}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\linewidth,
+                colback=tcoral,
+                colframe=tcoral,
+                opacityback=0.10,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+
+% environment for header that includes question numbers
+\newenvironment{hwheader}
+    {
+        \begin{flushright}
+            \begin{tcolorbox}[
+                width=0.55\textwidth,
+                colback=tlightblue,
+                colframe=tblue,
+                opacityback=0.25,
+                enhanced jigsaw
+            ]
+                \begin{flushright}
+                    Logan Hotz \\
+    }
+    {
+                \end{flushright}
+            \end{tcolorbox}
+        \end{flushright}
+        \vspace{4mm}
+    }
+
+
+
+
+
+\begin{document}
+
+
+
+    \begin{hwheader}
+        Stochastic Calculus for Finance II
+
+        Shreve
+    \end{hwheader}
+
+
+
+
+
+    %-- question 1
+    \begin{hwquestion}
+        Suppose $M(t)$, $0 \leq t \leq T$, is a martingale with respect to some filtration
+        $\cF(t)$, $0 \leq t \leq T$. Let $\Delta(t)$, $0 \leq t \leq T$, be a simple process
+        adapted to $\cF(t)$ (i.e. there is a partion $\Pi_n = \{ t_0, t_1, \dots, t_n \}$ of
+        $[0, T]$ such that, for every $j$, $\Delta(t_j)$ is $\cF(t_j)$-measurable and
+        $\Delta(t)$ is constant in $t$ on each subinterval $[t_{j}, t_{j+1})$). For $t \in
+        [t_{k}, t_{k+1})$, define the stochastic integral
+        \[
+            I(t)
+            =
+            \sum_{j=0}^{k-1}
+            \Delta(t_j) \big[ M(t_{j+1}) - M(t_{j}) \big]
+            +
+            \Delta(t_{k}) \big[ M(t) - M(t_{k}) \big].
+        \]
+        We think of $M(t)$ as the price of an asset at time $t$ and $\Delta(t_j)$ as the
+        number of shares of the asset held by an investor between times $t_{j}$ and $t_{j
+        +1}$. Then $I(t)$ is the capital gains that accrue to the investor between times
+        $0$ and $t$. Show that $I(t)$, $0 \leq t \leq T$, is a martingale.
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        Let $s$ and $t$ be positive constants with $0 \leq s \leq t \leq T$, and further
+        let $[t_{\ell}, t_{\ell+1})$ be the subinterval that contains $s$. We then have
+        that
+        \[
+            \begin{multlined}
+                I(t) - I(s)
+                \\
+                %
+                %
+                =
+                \Delta(t_{\ell}) \big[ M(t_{\ell+1}) - M(s) \big]
+                +
+                \sum_{j=\ell+1}^{k-1}
+                \Delta(t_{j}) \big[ M(t_{j+1}) - M(t_{j}) \big]
+                +
+                \Delta(t_{k}) \big[ M(t) - M(t_{k}) \big].
+            \end{multlined}
+        \]
+        As $s \geq t_{\ell}$, the allocation $\Delta(t_{\ell})$ is known at time $s$, and
+        because $M(t)$ is a martingale with respect to $\cF(t)$, the first term's
+        conditional expectation is zero: $\E\big[ \Delta(t_{\ell}) (M(t_{\ell+1}) - M(t_{
+        \ell})) | \cF(s) \big] = \Delta(t_{\ell}) \big( \E[ M(t_{\ell+1}) | \cF(s) ] - 
+        M(s) \big) = \Delta(t_{\ell}) \big( M(s) - M(s) \big) = 0$. 
+
+        Next, take $j$ to be an integer with $\ell + 1 \leq j \leq k - 1$. Because $M(u)
+        - M(v)$, $u \geq v$, is mean-zero conditional on time-$v$ information, we have
+        \[
+            \begin{aligned}
+                \E\left[
+                    \Delta(t_j) \big( M(t_{j+1}) - M(t_{j}) \big)
+                    \, | \,
+                    \cF(s)
+                \right]
+                &=
+                \E\left[
+                    \E\big[
+                        \Delta(t_j) \big( M(t_{j+1}) - M(t_{j}) \big)
+                        \, | \,
+                        \cF(t_{j})
+                    \big]
+                    \, | \,
+                    \cF(s)
+                \right]
+                \\
+                %
+                %
+                &=
+                \E\left[
+                    \Delta(t_j)
+                    \E\big[
+                        M(t_{j+1}) - M(t_{j})
+                        \, | \,
+                        \cF(t_{j})
+                    \big]
+                    \, | \,
+                    \cF(s)
+                \right]
+                \\
+                %
+                %
+                &=
+                \E\big[
+                    \Delta(t_j) \times 0
+                    \, | \,
+                    \cF(s)
+                \big]
+                =
+                0.
+            \end{aligned}
+        \]
+        Using the same chain of logic, it can be shown that the final term is zero
+        conditional on time-$s$ information. Thus,
+        \[
+            \E\big[ I(t) - I(s) \, | \, \cF(s) \big]
+            =
+            0
+            \quad \iff \quad
+            \E\big[ I(t) \, | \, \cF(s) \big]
+            =
+            \E\big[ I(s) \, | \, \cF(s) \big]
+            =
+            I(s),
+        \]
+        showing that $I(s)$ is indeed a martingale.
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 2
+    \begin{hwquestion}
+        Let $W(t)$, $0 \leq t \leq T$, be a Brownian motion, and let $\cF(t)$, $0 \leq t
+        \leq T$, be an associated filtration. Let $\Delta(t)$, $0 \leq t \leq T$, be a
+        \emph{non-random} simple process (i.e. there is a partion $\Pi_n = \{ t_0, t_1,
+        \dots, t_n \}$ of $[0, T]$ such that, for every $j$, $\Delta(t_j)$ is a nonrandom
+        quantity and $\Delta(t) = \Delta(t_j)$ is constant in $t$ on each subinterval
+        $[t_{j}, t_{j+1})$). For $t \in [t_{k}, t_{k+1}]$, define the stochastic integral
+        \[
+            I(t)
+            =
+            \sum_{j=0}^{k-1}
+            \Delta(t_j) \big[ W(t_{j+1}) - W(t_{j}) \big]
+            +
+            \Delta(t_{k}) \big[ W(t) - W(t_{k}) \big].
+        \]
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Show that whenever $0 \leq s < t \leq T$, the increment $I(t) - I(s)$
+            is independent of $\cF(s)$.
+            \item Show that whenever $0 \leq s < t \leq T$, the increment $I(t) - I(s)$
+            is a normally distributed random variable with mean zero and variance
+            $\int_{s}^{t} \Delta^2(u) \, \text{d} u$.
+            \item Use (i) and (ii) to show that $I(t)$, $0 \leq t \leq T$, is a martingale.
+            \item Show that $I^2(t) - \int_{0}^{t}\Delta^2(u) \, \text{d} u$, $0 \leq t
+            \leq T$, is a martingale.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item It is sufficient to show that $I(t_k) - I(t_{\ell})$ is independent of
+            $\cF(t_{\ell})$ for partition points $t_{k}$ and $t_{\ell}$, with $t_{\ell}
+            < t_{k}$. Indeed, to see this is the case, let $\Pi_{n}$ be a partition of $[0,
+            T]$ with $n$ points. If the given $s$ resides in a subinterval $[t_{\ell},
+            t_{\ell+1})$ of $\Pi_{n}$, we can construct a partition $\Pi_{n+1} \equiv \Pi_{n}
+            \cup \{ s \}$ and set $\Delta(s) = \Delta(t_{\ell})$. The stochastic integral
+            over this partition evaluates to the same value as that over the $\Pi_{n}$
+            partition. The same logic applies for $t \in [t_{k}, t_{k+1})$.
+
+            Take $t_{\ell} < t_{k}$ to be two parition points. Then
+            \[
+                I(t_{k}) - I(t_{\ell})
+                =
+                \sum_{j=\ell}^{k-1}
+                \Delta(t_{j}) \big[ W(t_{j+1}) - W(t_{j}) \big].
+            \]
+            Recall that $\Delta(t)$ is a \emph{non-random} process, so the independence
+            of $\Delta(t_{j}) \big[ W(t_{j+1}) - W(t_{j}) \big]$ and $\cF(t_{\ell})$ only
+            hinges on the independence of $W(t_{j+1}) - W(t_{j})$ and $\cF(t_{\ell})$. For
+            $t \geq t_{\ell}$, the filtration satisfies $\cF(t) \supseteq \cF(t_{\ell})$,
+            and because $W(t)$ is a Brownian motion, $W(t_{j+1}) - W(t_{j})$ is independent
+            of $\cF(t_{j})$. But $t_{j} \geq t_{\ell}$, so $W(t_{j+1}) - W(t_{j})$ is
+            independent of $\cF(t_{\ell}) \subseteq \cF(t_{j})$ for all $j$. Thus $I(t_{k})
+            - I(t_{\ell})$ must also be independent of $\cF(t_{\ell})$.
+
+            \item Without loss of generality, we can take $t$ and $s$ to be partition
+            points. Then $t = t_{k}$ and $s = t_{\ell}$ for some integers $k$ and $\ell$,
+            and
+            \[
+                I(t)
+                -
+                I(s)
+                =
+                \sum_{j=\ell}^{k-1}
+                \Delta(t_{j}) \big[ W(t_{j+1}) - W(t_{j}) \big].
+            \]
+            That is, $I(t) - I(s)$ is a linear combination of independent normal random
+            variables, with coefficients given by the non-random $\Delta(t_{j})$, meaning
+            $I(t) - I(s)$ is itself a normal random variable. The component of the sum with
+            index $j$ has mean and variance
+            \[
+                \begin{multlined}
+                    \E\big[
+                        \Delta(t_j) (W(t_{j+1}) - W(t_{j}))
+                    \big]
+                    =
+                    \Delta(t_j)
+                    \E\big[
+                        (W(t_{j+1}) - W(t_{j}))
+                    \big]
+                    = 0
+                    \qquad \text{and}
+                    \\
+                    %
+                    %
+                    \Var\big(
+                        \Delta(t_j) (W(t_{j+1}) - W(t_{j}))
+                    \big)
+                    =
+                    \Delta^2(t_j) \big( t_{j+1} - t_{j} \big)
+                    =
+                    \int_{t_{j}}^{t_{j+1}}
+                    \Delta^2(u) \, \text{d} u,
+                \end{multlined}
+            \]
+            respectively. Thus $I(t) - I(s)$ has mean zero and variance
+            \[
+                \sum_{j=\ell}^{k-1}
+                \int_{t_{j}}^{t_{j+1}}
+                \Delta^2(u) \, \text{d} u
+                =
+                \int_{t_{\ell}}^{t_{k}}
+                \Delta^2(u) \, \text{d} u
+                =
+                \int_{s}^{t}
+                \Delta^2(u) \, \text{d} u.
+            \]
+
+            \item $I(t) - I(s)$ is independent of $\cF(s)$, so conditioning on $\cF(s)$
+            gives no extra information: $\E\big[ I(t) - I(s) \, | \, \cF(s) \big] = \E\big[
+            I(t) - I(s) \big] = 0$. Thus $\E\big[ I(t) \, | \, \cF(s) \big] = \E\big[ I(s)
+            \, | \, \cF(s) \big] = I(s)$.
+
+            \item Taking a cue from the text, define $D_j = W(t_{j+1}) - W(t_{j})$ for $j =
+            0, \dots, k-1$ and $D_{k} = W(t) - W(t_{k})$. Then $I(t) = \sum_{j=0}^{k}
+            \Delta(t_{j}) D_j$, and
+            \[
+                I^2(t)
+                =
+                \sum_{j=0}^{k}
+                \Delta^2(t_j) D_{j}^2
+                +
+                2
+                \sum_{0 \leq i < j \leq k}
+                \Delta(t_{i}) \Delta(t_{j})
+                D_{i} D_{j}.
+            \]
+            Fix an $s < t$ and let $[t_{\ell}, t_{\ell+1})$ be the subinterval that contains
+            $s$.
+
+            The square terms can be written as
+            \[
+                \begin{multlined}
+                    \sum_{j=0}^{k}
+                    \Delta^2(t_j) D_{j}^2
+                    =
+                    \sum_{j=0}^{\ell-1}
+                    \Delta^2(t_j) D_{j}^2
+                    +
+                    \Delta^2(t_{\ell}) \big[ W(s) - W(t_{\ell}) \big]^2
+                    \\
+                    %
+                    %
+                    +
+                    \Delta^2(t_{\ell+1}) \big[ W(t_{\ell+1}) - W(s) \big]^2
+                    +
+                    \sum_{j=\ell+1}^{k}
+                    \Delta^2(t_j) D_{j}^2.
+                \end{multlined}
+            \]
+            Conditional on $\cF(s)$, the first two terms on the right-hand side above are
+            known. Relying on the non-random nature of $\Delta(t)$, the latter two terms
+            are
+            \[
+                \begin{multlined}
+                    \E\left[
+                        \Delta^2(t_{\ell+1}) \big[ W(t_{\ell+1}) - W(s) \big]^2
+                        +
+                        \sum_{j=\ell+1}^{k}
+                        \Delta^2(t_j) D_{j}^2
+                        \, \bigg| \,
+                        \cF(s)
+                    \right]
+                    \\
+                    %
+                    %
+                    =
+                    \Delta^2(t_{\ell+1})
+                    \E\big[
+                        (W(t_{\ell+1}) - W(s))^2
+                        \, | \,
+                        \cF(s)
+                    \big]
+                    +
+                    \sum_{j=\ell+1}^{k}
+                    \Delta^2(t_j)
+                    \E\big[
+                        D_{j}^2
+                        \, | \,
+                        \cF(s)
+                    \big]
+                \end{multlined}
+            \]
+            Since future increments are independent of $\cF(s)$, the expectation terms above
+            are the variance of those increments, reducing the above expression to
+            \[
+                \Delta^2(t_{\ell+1})
+                \big( t_{\ell+1} - s \big)
+                +
+                \sum_{j=\ell+1}^{k-1}
+                \Delta^2(t_j)
+                \big( t_{j+1} - t_{j} \big)
+                +
+                \Delta^2(t_k)
+                \big( t - t_{k} \big)
+                =
+                \int_{s}^{t}
+                \Delta^2(u) \, \text{d} u.
+            \]
+
+            The cross terms with indices $i < j$ that satisfy $j > \ell$ are zero in
+            conditional expectation, given the independent and mean-zero qualities of the
+            increments:
+            \[
+                \E\big[
+                    D_{i} D_{j}
+                    \, | \,
+                    \cF(s)
+                \big]
+                =
+                \E\big[
+                    D_{i}
+                    \, | \,
+                    \cF(s)
+                \big]
+                \E\big[
+                    D_{i}
+                    \, | \,
+                    \cF(s)
+                \big]
+                =
+                0,
+                \quad
+                \begin{array}{r l}
+                    i &< j \\
+                    j &> \ell
+                \end{array}.
+            \]
+            Note that it is not always the case that both of the expectations in the middle
+            expression are zero; that only occurs when $j > i > \ell$, where $[t_{\ell},
+            t_{\ell+1})$ is the subinterval containing $s$. For cross terms with indices
+            $\ell \geq j > i$, the $D_{i}$ increments are known; in short we have
+            \[
+                \E\left[
+                    2
+                    \sum_{0 \leq i < j \leq k}
+                    \Delta(t_i) \Delta(t_j)
+                    D_i D_j
+                \right]
+                =
+                2 \sum_{0 \leq i < j \leq \ell}
+                \Delta(t_i) \Delta(t_j)
+                D_i D_j,
+            \]
+            where we have abused notation a little bit in using $D_{\ell}$ to represent
+            $W(t) - W(t_{\ell})$. We continue to make this choice in what follows.
+
+            At this point, we have shown, for $s < t$,
+            \[
+                \begin{multlined}
+                    \E\left[
+                        I^2(t)
+                        \, | \,
+                        \cF(s)
+                    \right]
+                    =
+                    \sum_{j=0}^{\ell-1}
+                    \Delta^2(t_j) D_{j}^2
+                    +
+                    \Delta^2(t_{\ell}) \big[ W(s) - W(t_{\ell}) \big]^2
+                    \\
+                    %
+                    %
+                    +
+                    2 \sum_{0 \leq i < j \leq \ell}
+                    \Delta(t_i) \Delta(t_j)
+                    D_i D_j
+                    +
+                    \int_{s}^{t} \Delta^2(u) \, \text{d} u.
+                \end{multlined}
+            \]
+            But! Notice the first three terms are precisely $I^2(s)$. Thus,
+            \[
+                \begin{aligned}
+                    \E\left[
+                        I^2(t) - \int_{0}^{t} \Delta^2(u) \, \text{d} u
+                        \, \bigg| \,
+                        \cF(s)
+                    \right]
+                    &=
+                    I(s) + \int_{s}^{t} \Delta^2(u) \, \text{d} u
+                    -
+                    \int_{0}^{t} \Delta^2(u) \, \text{d} u
+                    \\
+                    %
+                    %
+                    &=
+                    I(s) - \int_{0}^{s} \Delta^2(u) \, \text{d} u,
+                \end{aligned}
+            \]
+            thereby confirming $I^2(t) - \int_{0}^{t} \Delta^2(u) \, \text{d} u$ is a
+            martingale.
+
+            \vspace{1cm}
+
+            There is an alternative, less mechanical way to show this, too:
+            \[
+                \begin{aligned}
+                    {}
+                    &
+                    \E\left[
+                        I^2(t) - \int_{0}^{t} \Delta^2(u) \, \text{d} u
+                        -
+                        \left(
+                            I^2(s) - \int_{0}^{s} \Delta^2(u) \, \text{d} u
+                        \right)
+                        \, \bigg| \,
+                        \cF(s)
+                    \right]
+                    \\
+                    %
+                    %
+                    &=
+                    \E\left[
+                        I^2(t) - I^2(s)
+                        -
+                        \int_{s}^{t} \Delta^2(u) \, \text{d} u
+                        \, \bigg| \,
+                        \cF(s)
+                    \right]
+                    \\
+                    %
+                    %
+                    &=
+                    \E\left[
+                        \big( I(t) - I(s) \big)^2
+                        +
+                        2 I(t) I(s)
+                        -
+                        2 I^2(s)
+                        \, | \,
+                        \cF(s)
+                    \right]
+                    -
+                    \int_{s}^{t} \Delta^2(u) \, \text{d} u
+                \end{aligned}
+            \]
+            Because $I(t) - I(s)$ is a mean-zero variable with variance $\int_{s}^{t}
+            \Delta^2(u) \, \text{d} u$, independent of $\cF(s)$,
+            \[
+                \E\left[
+                    \big( I(t) - I(s) \big)^2
+                    \, | \,
+                    \cF(s)
+                \right]
+                =
+                \E\left[
+                    \big( (I(t) - I(s)) - 0 \big)^2
+                \right]
+                =
+                \int_{s}^{t} \Delta^2(u) \, \text{d} u.
+            \]
+            As shown in part (iii), $I$ is a martingale -- therefore,
+            \[
+                \E\big[
+                    I(t) I(s)
+                    \, | \,
+                    \cF(s)
+                \big]
+                =
+                I(s)
+                \E\big[
+                    I(t)
+                    \, | \, 
+                    \cF(s)
+                \big]
+                =
+                I^2(s).
+            \]
+            Thus,
+            \[
+                \begin{multlined}
+                    \E\left[
+                        I^2(t) - \int_{0}^{t} \Delta^2(u) \, \text{d} u
+                        -
+                        \left(
+                            I^2(s) - \int_{0}^{s} \Delta^2(u) \, \text{d} u
+                        \right)
+                        \, \bigg| \,
+                        \cF(s)
+                    \right]
+                    \\
+                    %
+                    %
+                    =
+                    \int_{s}^{t}
+                    \Delta^2(u) \, \text{d} u
+                    + 2 I^2(s)
+                    - 2 I^2(s)
+                    -
+                    \int_{s}^{t}
+                    \Delta^2(u) \, \text{d} u
+                    =
+                    0.
+                \end{multlined}
+            \]
+        \end{enumerate}
+    \end{hwanswer}
+
+
+    
+
+
+    %-- question 3
+    \begin{hwquestion}
+        We now consider a case in which $\Delta(t)$ in Exercise 4.2 is simple but random. In
+        particular, let $t_0 = 0$, $t_1 = s$, and $t_2 = t$ and let $\Delta(0)$ be nonrandom
+        and $\Delta(s) = W(s)$. Which of the following assertions is true? Justify your
+        answers.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item $I(t) - I(s)$ is independent of $\cF(s)$.
+            \item $I(t) - I(s)$ is normally distributed.
+            \item $\E\big[ I(t) \, | \, \cF(s) \big]= I(s)$.
+            \item $\E\left[ I^2(t) - \int_{0}^{t} \Delta^2(u) \, \text{d} u \, | \, \cF(s)
+            \right] = I^2(s) - \int_{0}^{s} \Delta^2(u) \, \text{d} u$.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        The It\^{o} integrals at times $s$ and $t$ are
+        \[
+            \begin{aligned}
+                I(t)
+                &=
+                \Delta(0) \big[ W(s) - W(0) \big]
+                +
+                \Delta(s) \big[ W(t) - W(s) \big]
+                \\
+                %
+                %
+                &=
+                \Delta(0) W(s)
+                +
+                W(s) \big[ W(t) - W(s) \big]
+                \\
+                %
+                %
+                \text{and} \qquad
+                I(s)
+                &=
+                \Delta(0) \big[ W(s) - W(0) \big]
+                =
+                \Delta(0) W(s).
+            \end{aligned}
+        \]
+        Thus $I(t) - I(s) = W(s)\big[ W(t) - W(s) \big]$.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i)]
+            \item {\bfseries False.} $W(s) \in \cF(s)$, so $I(t) - I(s)$ is not independent
+            of $\cF(s)$.
+
+            \item {\bfseries False.} A normal random variable $X$ with mean zero satisfies
+            $\E[X^4] = 3 \E[X^2]$. We will show that $I(t) - I(s)$ does not exhibit this
+            property.
+
+            Throughout we use the fact that $W(s)$ is independent of the future increment
+            $W(t) - W(s)$. The fourth moment of $I(t) - I(s)$ is
+            \[
+                \begin{multlined}
+                    \E\left[
+                        \big(I(t) - I(s)\big)^4
+                    \right]
+                    =
+                    \E\left[
+                        W(s)^4 \big(W(t) - W(s)\big)^4
+                    \right]
+                    \\
+                    %
+                    %
+                    =
+                    \E\left[
+                        W(s)^4
+                    \right]
+                    \E\left[
+                        \big(W(t) - W(s)\big)^4
+                    \right]
+                    =
+                    ( 3 s ) \big[ 3(t - s) \big]
+                    =
+                    9 s(t - s).
+                \end{multlined}
+            \]
+            Whereas the second moment of $I(t) - I(s)$ is
+            \[
+                \E\left[
+                    \big( I(t) - I(s) \big)^2
+                \right]
+                =
+                \E\left[
+                    W(s)^2
+                \right]
+                \E\left[
+                    \big(W(t) - W(s)\big)^2
+                \right]
+                =
+                s (t - s).
+            \]
+            As $9 s (t - s) \neq 3 s (t - s)$, $I(t) - I(s)$ is not normally distributed.
+
+            \item {\bfseries True.} Because the increment $W(t) - W(s)$ is independent of
+            $\E\big[ W(t) - W(s) \, | \, \cF(s) \big] = \E\big[ W(t) - W(s) \big] = 0$.
+            Therefore,
+            \[
+                \begin{multlined}
+                    \E\big[
+                        I(t) - I(s)
+                        \, | \,
+                        \cF(s)
+                    \big]
+                    =
+                    \E\left[
+                        W(s) \big( W(t) - W(s) \big)
+                        \, | \,
+                        \cF(s)
+                    \right]
+                    \\
+                    =
+                    W(s)
+                    \E\big[
+                        W(t) - W(s)
+                        \, | \,
+                        \cF(s)
+                    \big]
+                    =
+                    0.
+                \end{multlined}
+            \]
+
+            \item {\bfseries True.} Consider how
+            \[
+                \begin{multlined}
+                    \E\left[
+                        \left(
+                            I(t)^2 - \int_{0}^{t} \Delta(u)^2 \, \text{d} u
+                        \right)
+                        -
+                        \left(
+                            I(s)^2 - \int_{0}^{s} \Delta(u)^2 \, \text{d} u
+                        \right)
+                        \, \bigg| \,
+                        \cF(s)
+                    \right]
+                    \\
+                    %
+                    %
+                    \E\left[
+                        \big( I(t) - I(s) \big)^2
+                        +
+                        2 I(t) I(s) - 2I(s)^2
+                        -
+                        \int_{s}^{t} \Delta(u)^2 \, \text{d} u
+                        \, \bigg| \,
+                        \cF(s).
+                    \right]
+                \end{multlined}
+            \]
+            In expectation the first term is
+            \[
+                \begin{multlined}
+                    \E\left[
+                        \big( I(t) - I(s) \big)^2
+                        \, | \,
+                        \cF(s)
+                    \right]
+                    =
+                    \E\left[
+                        W(s)^2 \big( W(t) - W(s) \big)^2
+                        \, | \,
+                        \cF(s)
+                    \right]
+                    \\
+                    %
+                    %
+                    =
+                    W(s)^2
+                    \E\left[ \big(W(t) - W(s)\big)^2 \right]
+                    =
+                    W(s)^2 (t - s).
+                \end{multlined}
+            \]
+            The middle two terms are zero: $\E\big[ 2 I(t) I(s) - 2 I(s)^2 \, | \, \cF(s)
+            \big] = 2 \E[I(t) \, | \, \cF(s)] I(s) - 2 I(s)^2 = 0$. Finally, the integral
+            term is known conditional on $\cF(s)$:
+            \[
+                \E\left[
+                    \int_{s}^{t}
+                    \Delta(u)^2 \, \text{d} u
+                    \, \bigg| \,
+                    \cF(s)
+                \right]
+                =
+                \E\left[
+                    \Delta(s)^2 \big(t - s \big)
+                    \, | \,
+                    \cF(s)
+                \right]
+                =
+                W(s)^2 \big( t - s \big)
+            \]
+            Thus,
+            \[
+                \E\left[
+                    I(t)^2 - \int_{0}^{t} \Delta(u)^2 \, \text{d} u
+                    \, \bigg| \,
+                    \cF(s)
+                \right]
+                =
+                I(s)^2 - \int_{0}^{s} \Delta(u)^2 \, \text{d} u.
+            \]
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 4
+    \begin{hwquestion}[Stratonovich Integral]
+        Let $W(t), t \geq 0$ be a Brownian motion. Let $T$ be a fixed positive number and
+        let $\Pi = \{ t_0, t_1, \dots, t_n \}$ be a partition of $[0, T]$ (i.e. $0 = t_0
+        < t_1 < \cdots < t_n = T$). For each $j$, define $t_{j}^{*} = \nicefrac{(t_j +
+        t_{j+1})}{2}$ to be the midpoint of the interval $[t_j, t_{j+1}]$.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Define the \emph{half-sample quadratic variation} corresponding to $\Pi$
+            to be
+            \[
+                Q_{\Pi/2}
+                =
+                \sum_{j=0}^{n-1}
+                \big(
+                    W(t_{j}^{*}) - W(t_j)
+                \big)^2.
+            \]
+            Show that $Q_{\Pi/2}$ has limit $\nicefrac{T}{2}$ as $\norm{\Pi} \to 0$.
+            \item Define the Stratonovich integral of $W(t)$ with respect to $W(t)$ to be
+            \[
+                \int_{0}^{T}
+                W(t) \circ d W(t)
+                =
+                \lim_{\norm{\Pi} \to 0}
+                \sum_{j=0}^{n-1}
+                W(t_{j}^{*})\big( W(t_{j+1}) - W(t_{j}) \big).
+            \]
+            In contrast to the It\^{o} integral $\int_{0}^{T} W(t) dW(t) = \tfrac{1}{2}
+            W^2(T) - \nicefrac{T}{2}$, which evaluates the integrand at the left endpoint
+            of each subinterval $[t_{j}, t_{j+1}]$, here we evaluate the integrand at the
+            midpoint $t_{j}^{*}$. Show that
+            \[
+                \int_{0}^{T}
+                W(t) \circ dW(t)
+                =
+                \sfrac{1}{2} W^2(T).
+            \]
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item For brevity, define $D_j = W(t_j^*) - W(t_j)$ for $j = 0, \dots, n - 1$.
+            The expected value of the half-sample quadratic variation is
+            \[
+                \E\left[
+                    Q_{\Pi/2}
+                \right]
+                =
+                \sum_{j=0}^{n-1}
+                \E \big[ D_j^2 \big]
+                =
+                \sum_{j=0}^{n-1}
+                \left(
+                    \sfrac{t_{j+1} + t_{j}}{2}
+                    -
+                    t_j
+                \right)
+                =
+                \sfrac{1}{2}
+                \sum_{j=0}^{n-1}
+                (t_{j+1} - t_{j})
+                =
+                \sfrac{T}{2},
+            \]
+            where the second equality follows from the fact that $D_{j} = W(t_j^*) - W(t_j)$
+            is a Brownian increment.
+
+            Next consider the variance of the half-sample quadratic variance:
+            \[
+                \Var\left( Q_{\Pi/2} \right)
+                =
+                \E\left[
+                    \left(
+                        \textstyle\sum\limits_{j=0}^{n-1}
+                        D_j^2
+                        -
+                        \sfrac{T}{2}
+                    \right)^2
+                \right]
+                =
+                \E\left[
+                    \left(
+                        \textstyle\sum\limits_{j=0}^{n-1}
+                        D_j^2
+                        -
+                        \textstyle\sum\limits_{j=0}^{n-1}
+                        \sfrac{t_{j+1}-t_{j}}{2}
+                    \right)^2
+                \right].
+            \]
+            We can combine the two summations to derive
+            \[
+                \begin{multlined}
+                \Var\left( Q_{\Pi/2} \right)
+                =
+                \E\left[
+                    \left(
+                        \textstyle\sum\limits_{j=0}^{n-1}
+                        \left[
+                            D_j^2
+                            -
+                            \sfrac{t_{j+1}-t_{j}}{2}
+                        \right]
+                    \right)^2
+                \right]
+                \\
+                %
+                %
+                =
+                \textstyle\sum\limits_{j=0}^{n-1}
+                \E\left[
+                    \left(
+                        D_j^2
+                        -
+                        \sfrac{t_{j+1}-t_{j}}{2}
+                    \right)^2
+                \right]
+                +
+                2
+                \textstyle\sum\limits_{0 \leq i < j \leq n-1}
+                \E\left[
+                    \left(
+                        D_i^2
+                        -
+                        \sfrac{t_{i+1}-t_{i}}{2}
+                    \right)
+                    \left(
+                        D_j^2
+                        -
+                        \sfrac{t_{j+1}-t_{j}}{2}
+                    \right)
+                \right]
+                \end{multlined}
+            \]
+            For every $j = 0, \dots, n - 1$, we have that
+            \[
+                \E\left[
+                    D_j^2
+                    -
+                    \sfrac{t_{j+1}-t_{j}}{2}
+                \right]
+                =
+                \E\left[
+                    \big( W(t_j^*) - W(t_j) \big)^2
+                \right]
+                -
+                \sfrac{t_{j+1}-t_{j}}{2}
+                =
+                \left(
+                    \sfrac{t_{j+1} + t_{j}}{2}
+                    -
+                    t_{j}
+                \right)
+                -
+                \sfrac{t_{j+1}-t_{j}}{2}
+                =
+                0.
+            \]
+            This is especially useful when considering the cross-terms in the expression
+            for $\Var(Q_{\Pi/2})$, because the $D_i^2$ and $D_j^2$ terms are
+            non-overlapping. Thus they're functions of independent Brownian increments, and
+            are therefore independent themselves. For the $i < j$ term of the cross-term
+            summation, then,
+            \[
+                \E\left[
+                    \left(
+                        D_i^2
+                        -
+                        \sfrac{t_{i+1}-t_{i}}{2}
+                    \right)
+                    \left(
+                        D_j^2
+                        -
+                        \sfrac{t_{j+1}-t_{j}}{2}
+                    \right)
+                \right]
+                =
+                \E\left[
+                    D_i^2
+                    -
+                    \sfrac{t_{i+1}-t_{i}}{2}
+                \right]
+                \E\left[
+                    D_j^2
+                    -
+                    \sfrac{t_{j+1}-t_{j}}{2}
+                \right]
+                =
+                0.
+            \]
+            Therefore $\Var(Q_{\Pi/2})$ reduces to
+            \[
+                \Var\left( Q_{\Pi/2} \right)
+                =
+                \textstyle\sum\limits_{j=0}^{n-1}
+                \E\left[
+                    \left(
+                        D_j^2
+                        -
+                        \sfrac{t_{j+1}-t_{j}}{2}
+                    \right)^2
+                \right].
+            \]
+
+            Consider the $j$-th term in that summation;
+            \[
+                \begin{multlined}
+                    \E\left[
+                        \left(
+                            D_j^2
+                            -
+                            \sfrac{t_{j+1}-t_j}{2}
+                        \right)^2
+                    \right]
+                    =
+                    \E\left[ D_j^4 \right]
+                    -
+                    2
+                    \sfrac{t_{j+1}-t_j}{2}
+                    \E\left[ D_j^2 \right]
+                    +
+                    \left(
+                        \sfrac{t_{j+1}-t_j}{2}
+                    \right)^2
+                    \\
+                    %
+                    %
+                    =
+                    3 \left(
+                        \E\big[ D_j^2 \big]
+                    \right)^2
+                    -
+                    \left(
+                        \sfrac{t_{j+1}-t_j}{2}
+                    \right)^2
+                    =
+                    3 \left(
+                        \sfrac{t_{j+1}-t_j}{2}
+                    \right)^2
+                    -
+                    \left(
+                        \sfrac{t_{j+1}-t_j}{2}
+                    \right)^2
+                    =
+                    2 \left(
+                        \sfrac{t_{j+1}-t_j}{2}
+                    \right)^2.
+                \end{multlined}
+            \]
+            Therefore we can bound the variance from above by
+            \[
+                \begin{multlined}
+                    \Var\left( Q_{\Pi/2} \right)
+                    =
+                    \sum_{j=0}^{n-1}
+                    2
+                    \left( \sfrac{t_{j+1} - t_{j}}{2} \right)^2
+                    =
+                    \sfrac{1}{2}
+                    \sum_{j=0}^{n-1}
+                    \big( t_{j+1} - t_{j} \big)^2
+                    \\
+                    %
+                    %
+                    \leq
+                    \sfrac{1}{2}
+                    \max_{i} |t_{i+1} - t_{i}|
+                    \sum_{j=0}^{n-1}
+                    (t_{j+1} - t_{j})
+                    =
+                    \sfrac{1}{2}
+                    T
+                    \max_{i} |t_{i+1} - t_{i}|.
+                \end{multlined}
+            \]
+            Taking $\norm{\Pi} \to 0$, the maximum gap between successive partition points
+            converges to zero. Thus $\Var(Q_{\Pi/2}) \to 0$.
+
+            Thus $Q_{\Pi/2}$ converges almost surely to $\nicefrac{T}{2}$.
+
+            \item
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 5
+    \begin{hwquestion}[Solving the Generalized Geometric Brownian Motion Equation]
+        Let $S(t)$ be a positive stochastic process that satisfies the generalized
+        geometric Brownian motion differential eqquation (see Example 4.4.8)
+        \[
+            d S(t)
+            =
+            \alpha(t) S(t) dt
+            +
+            \sigma(t) S(t) dW(t),
+        \]
+        where $\alpha(t)$ and $\sigma(t)$ are processes adapted to the filtration $\cF(t),
+        t \geq 0$, associated with the Brownian motion $W(t), t \geq 0$. In this exercise,
+        we show that $S(t)$ must be given by formula (4.4.26), reproduced here:
+        \[
+            S(t)
+            =
+            S(0)
+            \exp\left\{
+                \int_{0}^{t}
+                \sigma(s)
+                 d W(s)
+                 +
+                \int_{0}^{t}
+                \left(
+                    \alpha(s) - \sfrac{1}{2} \sigma(s)^2
+                \right)
+                d s
+            \right\}
+        \]
+        (i.e. that formula provides
+        the only solution to the stochastic differential equation (4.10.2)). In the process,
+        we provide a method for solving this equation.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Using the above formula, and the It\^{o}-Doeblin formula, compute $d
+            \log S(t)$. Simplify so that you have a formula for $d \log S(t)$ that does not
+            involve $S(t)$.
+
+            \item Integrate the formula you obtained in (i), and then exponentiate the
+            answer to obtain (4.4.26).
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item With $d S(t) = \alpha(t) S(t) dt + \sigma(t) S(t) dW(t)$ and $f(x) = \log
+            x$, the It\^{o}-Doeblin formula $d f(S(t)) = f'(S(t)) dS(t) + \frac{1}{2} f''(
+            S(t)) d S(t) dS(t)$ implies
+            \[
+                \begin{aligned}
+                    d \log S(t)
+                    &=
+                    \sfrac{1}{S(t)}
+                    \big(
+                        \alpha(t) S(t) d t
+                        +
+                        \sigma(t) S(t) d W(t)
+                    \big)
+                    +
+                    \sfrac{1}{2}
+                    \left(
+                        -\sfrac{1}{S(t)^2}
+                    \right)
+                    \sigma(t)^2 S(t)^2 dt
+                    \\
+                    %
+                    %
+                    &=
+                    \left(
+                        \alpha(t)
+                        -
+                        \sfrac{1}{2} \sigma(t)^2
+                    \right) dt
+                    +
+                    \sigma(t) d W(t).
+                \end{aligned}
+            \]
+
+            \item We integrate the expression above from $0$ to $t > 0$:
+            \[
+                \log S(t)
+                =
+                \int_{0}^{t}
+                d \log S(s) \, ds
+                =
+                \widetilde{S}(0)
+                +
+                \int_{0}^{t}
+                \sigma(s) \, d W(s)
+                +
+                \int_{0}^{t}
+                \alpha(s) - \sfrac{1}{2}\sigma(s)^2 \, ds,
+            \]
+            where $\widetilde{S}(0)$ is some nonrandom constant. Exponentiating, we have
+            \[
+                S(t)
+                =
+                S(0)
+                \exp\left\{
+                    \int_{0}^{t}
+                    \sigma(s) \, d W(s)
+                    +
+                    \int_{0}^{t}
+                    \alpha(s) - \sfrac{1}{2}\sigma(s)^2 \, ds,
+                \right\},
+            \]
+            where $S(0) = \exp( \widetilde{S}(0) ) > 0$.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 6
+    \begin{hwquestion}
+        Let $S(t) = S(0) \exp\left\{ \sigma W(t) + \left(\alpha - \frac{1}{2} \sigma^2
+        \right) t \right\}$ be a geometric Brownian motion. Let $p$ be a positive constant.
+        Compute $d(S^p(t))$, the differential of $S(t)$ raised to the point $p$.
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        Given a $p > 0, p \neq 1$, define $f(x) = x^p$. The It\^{o}-Doeblin formula
+        guarantees that
+        \[
+            d\big( S(t)^p \big)
+            =
+            d f(S(t))
+            =
+            p S(t)^{p-1} d S(t)
+            +
+            \sfrac{1}{2}
+            p (p - 1) S(t)^{p-2} d S(t) d S(t).
+        \]
+        Then, using the identities
+        \[
+            d S(t)
+            =
+            \alpha S(t) dt
+            +
+            \sigma S(t) d W(t)
+            \quad \text{and} \quad
+            d S(t)
+            d S(t)
+            =
+            \sigma^2 S(t)^2 dt,
+        \]
+        we have
+        \[
+            \begin{aligned}
+                d\big( S(t)^p \big)
+                &=
+                p \alpha S(t)^p dt
+                +
+                p \sigma S(t)^p d W(t)
+                +
+                \sfrac{1}{2}
+                p (p-1) \sigma^2 S(t)^p dt
+                \\
+                %
+                %
+                &=
+                p S(t)^p
+                \left[
+                    \sigma dW(t)
+                    +
+                    \left(
+                        \alpha + \sfrac{p-1}{2} \sigma^2
+                    \right)
+                    dt
+                \right].
+            \end{aligned}
+        \]
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 7
+    \begin{hwquestion}
+        \begin{enumerate}[(i), nolistsep]
+            \item Compute $d W^4(t)$ and then write $W^4(T)$ as the sum of an ordinary
+            (Lebesgue) integral with respect to time and an It\^{o} integral.
+            \item Take expectations on both sides of the formula you obtained in (i), use
+            the fact that $\E [W^2(t)] = t$, and derive the formula $\E[W^4(T)] = 3T^2$.
+            \item Use the method of (i) and (ii) to derive a formula for $\E[W^6(T)]$.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item Applying the It\^{o}-Doeblin to $f(W(t)) = W^4(t)$,
+            \[
+                d W^4(t)
+                =
+                4 W^3(t) d W(t)
+                +
+                \sfrac{1}{2}
+                12 W^2(t) d W(t) d W(t)
+                =
+                4 W^3(t) d W(t)
+                +
+                6 W^2(t) dt.
+            \]
+            Integrating from $0$ to $T$ and using the fact that $W(0) = 0$, we have
+            \[
+                W^4(T)
+                =
+                4 \int_{0}^{T}
+                W^3(t) \, d W(t)
+                +
+                6 \int_{0}^{T}
+                W^2(t) \, dt,
+            \]
+            where the first term is the It\^{o} integral and the second is the Lebesgue.
+
+            \item Recall that odd-numbered centered moments of normal random variables
+            (except for the first) are always zero. Thus
+            \[
+                \begin{multlined}
+                    \E \big[
+                        W^4(t)
+                    \big]
+                    =
+                    4 \int_{0}^{T}
+                    \E \big[
+                        W^3(t)
+                    \big]
+                    \, d W(t)
+                    +
+                    6 \int_{0}^{T}
+                    \E \big[
+                        W^2(t)
+                    \big]
+                    dt,
+                    \\
+                    %
+                    %
+                    =
+                    0
+                    +
+                    6
+                    \int_{0}^{T}
+                    t \, dt
+                    =
+                    3 t^2 \bigg|_{t=0}^{T}
+                    =
+                    3 T^2.
+                \end{multlined}
+            \]
+
+            \item From It\^{o}-Doeblin,
+            \[
+                \begin{multlined}
+                    d W^6(t)
+                    =
+                    6 W^5(t) d W(t)
+                    +
+                    15 W^4(t) dt
+                    \\
+                    %
+                    %
+                    \implies \qquad
+                    \E \big[
+                        W^6(T)
+                    \big]
+                    =
+                    15
+                    \int_{0}^{T}
+                    \E\big[ W^4(t) \big] \, dt
+                    =
+                    15
+                    \int_{0}^{T}
+                    3 t^2 \, dt
+                    =
+                    15 T^3.
+                \end{multlined}
+            \]
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 8
+    \begin{hwquestion}
+        The Vasicek interest rate stochastic differential equation (4.4.32) is
+        \[
+            d R(t)
+            =
+            \big(
+                \alpha - \beta R(t)
+            \big) dt
+            +
+            \sigma d W(t),
+        \]
+        where $\alpha, \beta$, and $\sigma$ are positive constants. The solution to this
+        equation is given in Example 4.4.10. This exercise shows how to derive this
+        solution.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Use (4.4.32) and the It\^{o}-Doeblin formula to compute $d[ e^{\beta t}
+            R(t) ]$. Simplify it so that you have a formula for $d[ e^{\beta t} R(t) ]$
+            that does not involve $R(t)$.
+            \item Integrate the equation you obtained in (i) and solve for $R(t)$ to
+            obtain (4.4.33).
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item From the product rule, $d[ e^{\beta t} R(t) ] = \beta e^{\beta t} R(t)
+            dt + e^{\beta t} d R(t)$. From (4.4.32), then,
+            $
+                d \big[
+                    e^{\beta t}
+                    R(t)
+                \big]
+                =
+                \sigma e^{\beta t} dW(t)
+                +
+                \alpha e^{\beta t} dt
+                =
+                e^{\beta t}
+                \big[
+                    \sigma dW(t)
+                    +
+                    \alpha dt
+                \big].
+            $
+
+            \item Integrating from $0$ to $t > 0$,
+            \[
+                e^{\beta t} R(t)
+                =
+                \int_{0}^{t}
+                 d\big[ e^{\beta t} R(t) \big]
+                 \, dt
+                 =
+                 R(0)
+                 +
+                 \sigma
+                 \int_{0}^{t}
+                 e^{\beta s}
+                 \, d W(s)
+                 +
+                 \alpha
+                 \int_{0}^{t}
+                 e^{\beta s}
+                 \, ds.
+            \]
+            With $\int_{0}^{t} e^{\beta s} ds = \beta^{-1} (e^{\beta t} - 1)$, we can divide
+            both sides by $e^{\beta t}$ to derive
+            \[
+                R(t)
+                =
+                e^{-\beta t} R(0)
+                +
+                \sfrac{\alpha}{\beta}
+                \big(1 - e^{-\beta t}\big)
+                +
+                \sigma e^{-\beta t}
+                \int_{0}^{t}
+                e^{\beta s} \, d W(s),
+            \]
+            which is precisely (4.4.33).
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 9
+    \begin{hwquestion}
+        For a European call expiring at time $T$ with strike price $K$, the
+        Black-Scholes-Merton price at time $t$, if the time-$t$ stock price is $x$, is
+        \[
+            c(t, x)
+            =
+            x
+            N\big( d_{+}(T-t, x) \big)
+            -
+            K
+            e^{-r(T-t)}
+            N\big( d_{-}(T-t, x) \big),
+        \]
+        where
+        \[
+            \begin{aligned}
+                d_{+}(\tau, x)
+                &=
+                \sfrac{1}{\sigma \sqrt{\tau}}
+                \left[
+                    \log \sfrac{x}{K}
+                    +
+                    \left(
+                        r + \sfrac{1}{2} \sigma^2
+                    \right)
+                    \tau
+                \right],
+                \\
+                %
+                %
+                d_{-}(\tau, x)
+                &=
+                d_{+}(\tau, x)
+                -
+                \sigma \sqrt{\tau},
+            \end{aligned}
+        \]
+        and $N(y)$ is the cumulative standard normal distribution
+        \[
+            N(y)
+            =
+            \sfrac{1}{2\pi}
+            \int_{-\infty}^{y}
+            e^{-z^2/2}
+            \,
+            dz
+            =
+            \sfrac{1}{2\pi}
+            \int_{-y}^{\infty}
+            e^{-z^2/2}
+            \,
+            dz.
+        \]
+        The purpose of this exercise is to show that the function $c$ satisfies the
+        Black-Scholes-Merton partial differential equation
+        \[
+            c_t(t, x) + rxc_{x}(t, x) + \sfrac{1}{2}\sigma^2 x^2 c_{xx}(t, x)
+            =
+            r c(t, x),
+        \]
+        the \emph{terminal condition}
+        \[
+            \lim_{t \uparrow T}
+            c(t, x)
+            =
+            (x - K)^{+},
+            \qquad
+            x > 0, x \neq K,
+        \]
+        and the \emph{boundary conditions}
+        \[
+            \lim_{t \downarrow 0}
+            c(t, x) = 0,
+            \qquad
+            \lim_{x \to \infty}
+            c(t, x) = x - e^{-r(T-t)} K,
+            \quad
+            0 \leq t < T.
+        \]
+        The terminal condition and the first boundary condition are usually written more
+        simply but less precisely as
+        \[
+            c(T, x) = (x - K)^{+}, \quad x \geq 0,
+            \quad \text{and} \quad
+            c(t, 0) = 0, \quad 0 \leq t \leq T.
+        \]
+
+        For this exercise, we abbreviate $c(t, x)$ as simply $c$ and $d_{\pm}(T-t, x)$
+        as simply $d_{\pi}$.
+
+        \vspace{6mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Verify first the equation
+            \[
+                K e^{-r(T-t)} N'(d_{-}) = x N'(d_{+}).
+            \]
+
+            \item Show that $c_x = N(d_{+})$. This is the \emph{delta} of the option.
+
+            \item Show that
+            \[
+                    c_t
+                    =
+                    -r K e^{-r(T-t)} N(d_{-})
+                    -
+                    \sfrac{\sigma x}{2 \sqrt{T - t}}
+                    N'(d_{+}).
+            \]
+            This is the \emph{theta} of the option.
+
+            \item Use the formulas above to show that $c$ satisfies the
+            Black-Scholes-Merton differential equation.
+
+            \item Show that for $x > K$, $\lim_{t \uparrow T} d_{\pm} = \infty$, but for
+            $0 < x < K$, $\lim_{t \uparrow T} d_{\pm} = -\infty$. Use these equalities to
+            derive the terminal condition.
+
+            \item Show that for $0 \leq t < T$, $\lim_{x \downarrow 0} d_{\pm} = -\infty$.
+            Use this fact to verify the first part of the boundary condition as $x
+            \downarrow 0$.
+
+            \item Show that for $0 \leq t < T$, $\lim_{x \uparrow \infty} d_{\pm} = \infty$.
+            Use this fact to verify the second part of the boundary condition as $x
+            \uparrow \infty$. In this verification, you will need to show that
+            \[
+                \lim_{x \to \infty}
+                \frac{
+                    N(d_{+}) - 1
+                }{
+                    x^{-1}
+                }
+                =
+                0.
+            \]
+            This is an indeterminate form $\nicefrac{0}{0}$, and L'H\^{o}pital's rule
+            implies that this limit is
+            \[
+                \lim_{x \to \infty}
+                \frac{
+                    \sfrac{d}{dx}
+                    \left[
+                        N(d_{+}) - 1
+                    \right]
+                }{
+                    \sfrac{d}{dx}
+                    x^{-1}
+                }
+                =
+                0.
+            \]
+            Work out this expression and use the fact that
+            \[
+                x
+                =
+                K
+                \exp\left\{
+                    \sigma
+                    \sqrt{T - t}
+                    d_{+}
+                    -
+                    (T - t)
+                    \left(
+                        r + \sfrac{1}{2} \sigma^2
+                    \right)
+                \right\}
+            \]
+            to write this expression solely in terms of $d_{+}$ (i.e., without the
+            appearance of any $x$ except the $x$ in the argument of $d_{+}(T-t, x)$.)
+            Then argue that the limit is zero as $d_{+} \to \infty$.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item Throughout we use $\tau$ to denote $T - t$. The function $d_{-}(\tau, x)$
+            is explicitly written as
+            \[
+                d_{+}(\tau, x)
+                =
+                \sfrac{1}{\sigma \sqrt{\tau}}
+                \left[
+                    \log \sfrac{x}{K}
+                    +
+                    \left(
+                        r - \sfrac{1}{2} \sigma^2
+                    \right)
+                    \tau
+                \right].
+            \]
+            As a preliminary exercise, consider the quantity
+            \[
+                \left(
+                    r - \sfrac{1}{2} \sigma^2
+                \right)^2
+                +
+                2r \sigma^2
+                =
+                \left(
+                    r + \sfrac{1}{2} \sigma^2
+                \right)^2.
+            \]
+            Using this identity, we can write the argument of the exponential operator in
+            $e^{-r\tau} N'(d_{-}) = (2\pi)^{-1} \exp\left\{ \frac{-1}{2} d_{-}^2 - r\tau
+            \right\}$ as
+            \[
+                \begin{aligned}
+                    -\sfrac{1}{2}
+                    \left(
+                        d_{-}^2 + 2 r \tau
+                    \right)
+                    &=
+                    -\sfrac{1}{2\sigma^2\tau}
+                    \left[
+                        \left( \exp \sfrac{x}{K} \right)^2
+                        +
+                        2
+                        \left( r - \sfrac{\sigma^2}{2} \right)
+                        \tau
+                        \exp \sfrac{x}{K}
+                        +
+                        \left(
+                            r + \sfrac{1}{2} \sigma^2
+                        \right)^2
+                        \tau^2
+                    \right]
+                    \\
+                    %
+                    %
+                    &=
+                    -\sfrac{1}{2\sigma^2\tau}
+                    \left[
+                        \left(
+                            \log \sfrac{x}{K}
+                            +
+                            \left(
+                                r + \sfrac{1}{2} \sigma^2
+                            \right) \tau
+                        \right)^2
+                        -
+                        2 \sigma^2 \tau \log \sfrac{x}{K}
+                    \right]
+                    \\
+                    %
+                    %
+                    &=
+                    -\sfrac{1}{2}
+                    d_{+}^2
+                    +
+                    \log \sfrac{x}{K}.
+                \end{aligned}
+            \]
+            The first equality makes use of our preliminary result, and the second follows
+            from making the judicious addition of $0 = 2 \sigma^2 \tau \log(\nicefrac{x}{K})
+            - 2 \sigma^2 \tau \log(\nicefrac{x}{K})$ and rearranging the cross-term. 
+
+            Thus,
+            \[
+                e^{-r\tau}
+                N'(d_{-})
+                =
+                \sfrac{1}{2\pi}
+                \exp\left\{
+                    -\sfrac{1}{2} d_{+}^2
+                    +
+                    \log \sfrac{x}{K}
+                \right\}
+                =
+                N'(d_{+}) \sfrac{x}{K},
+            \]
+            from which the desired equality follows swiftly.
+
+            \item The only difference between $d_{+}$ and $d_{-}$ is the term with the
+            $\tau$ coefficient; hence
+            \[
+                \sfrac{
+                    \partial
+                }{
+                    \partial x
+                }
+                \big[
+                    d_{+}
+                \big]
+                =
+                \sfrac{
+                    \partial
+                }{
+                    \partial x
+                }
+                \big[
+                    d_{-}
+                \big].
+            \]
+            Turning to the partial derivative of the call price, $c_x$, we have
+            \[
+                \begin{aligned}
+                    c_x
+                    &=
+                    N(d_{+})
+                    +
+                    x N'(d_{+})
+                    \sfrac{\partial}{\partial x}
+                    \big[
+                        d_{+}
+                    \big]
+                    -
+                    K e^{-r\tau}
+                    N'(d_{-})
+                    \sfrac{\partial}{\partial x}
+                    \big[
+                        d_{-}
+                    \big]
+                    \\
+                    %
+                    %
+                    &=
+                    N(d_{+})
+                    +
+                    \left[
+                        x N'(d_{+}) - K e^{-r\tau} N'(d_{-})
+                    \right]
+                    \sfrac{\partial}{\partial x}
+                    \big[
+                        d_{+}
+                    \big].
+                \end{aligned}
+            \]
+            Using our result in part (i), the second term on the right-hand side is zero,
+            so we are forced to conclude $c_x = N(d_{+})$.
+
+            \item
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+\end{document}

@@ -1,0 +1,568 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[left=1.0in, top=1.0in, bottom=1.0in, right=1.0in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{bbm, bm}                     % blackboard and bold fonts
+\usepackage{mathtools}                   % provides starred version of bmatrix. loads amsmath
+\usepackage{float}                       % more exact placement of figures
+\usepackage{array}                       % justification of fixed-width columns & matrices
+\usepackage{arydshln}                    % dashed lines in matrices
+\usepackage{titlesec}                    % change title formats
+\usepackage[most, breakable]{tcolorbox}  % nicely colored boxes (most allows for no frames)
+\usepackage[shortlabels]{enumitem}       % change enumerate symbols
+\usepackage{nicefrac}                    % small in-line fractions
+\usepackage{booktabs}                    % nice table properties, e.g. toprule & bottomrule
+\usepackage{wasysym}                     % larger set of glyphs for, e.g. binary relations
+\usepackage[bottom]{footmisc}            % put footnote in environment at bottom of page
+\usepackage{threeparttable}              % notes at the table
+% \usepackage[capposition=top]{floatrow}   % `floatfoot` command for figure notes
+
+\usepackage{tikz}       % drawing stuff
+\usetikzlibrary{matrix} % drawing matrices
+
+\usepackage{stackengine, scalerel} % adding some padding in fractions
+
+\usepackage{siunitx}
+\sisetup{
+    per-mode = symbol,
+    output-decimal-marker = {.},
+    % group-minimum-digits = 4,
+    input-symbols = (),
+    range-units = brackets,
+    list-final-separator = { \translate{and} },
+    list-pair-separator = { \translate{and} },
+    range-phrase = { \translate{to (numerical range)} },
+}
+
+%-- enumerate options
+\setlist{
+    listparindent=\parindent,
+    parsep=0pt
+}
+
+
+% trinidad colors
+\definecolor{tgreen}{RGB}{57, 115, 82}
+\definecolor{tlightgreen}{RGB}{121, 217, 163}
+\definecolor{tmarigold}{RGB}{242, 159, 5}
+\definecolor{torange}{RGB}{217, 103, 4}
+\definecolor{tred}{RGB}{115, 32, 2}
+\definecolor{tcoral}{RGB}{242, 121, 131}
+\definecolor{tblue}{RGB}{12, 99, 102}
+\definecolor{tlightblue}{RGB}{20, 161, 166}
+\definecolor{tlava}{RGB}{73, 65, 55}
+\definecolor{tcoffee}{RGB}{58, 48, 45}
+
+
+
+\titleformat{\section}
+    {\large\scshape}{\thesection}{1em}{}
+\titleformat{\subsection}
+    {\large\scshape}{\thesubsection}{1em}{}
+
+% allows equation and align environments to break over pages
+\allowdisplaybreaks
+
+% faster way of writing a norm
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+%vectors with angle, parenthesis, & bracket delimiters
+\newcommand\avec[1]{\left\langle#1\right\rangle}
+\newcommand\pvec[1]{\left(#1\right)}
+\newcommand\bvec[1]{\left[#1\right]}
+
+% argmin and argmax operators
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+% shortening varepsilon
+\newcommand\ve{\varepsilon}
+
+% shortening common bold-faced letters and variance
+\newcommand\E{\mathbb{E}}
+\newcommand\R{\mathbb{R}}
+\newcommand\Var{\text{Var}}
+\newcommand\Cov{\text{Cov}}
+\renewcommand\P{\mathbb{P}} % \P is the paragraph symbol by default
+
+\newcommand\cF{\mathcal{F}}
+
+% succsim & precsim with slashes through it
+%   https://tex.stackexchange.com/a/479194
+\makeatletter
+\newcommand\nsuccsim{\mathrel{\mathpalette\varn@t\succsim}}
+\newcommand\nprecsim{\mathrel{\mathpalette\varn@t\precsim}}
+\newcommand\varn@t[2]{%
+    \vphantom{/{#2}}%
+    \ooalign{\hfil$\m@th#1/\mkern2mu$\cr\hfil$\m@th#1#2$\hfil\cr}%
+}
+\makeatother
+
+% partial derivatives
+\newcommand\dd[2]{\frac{\partial#1}{\partial#2}}
+\newcommand\ndd[2]{\nicefrac{\partial#1}{\partial#2}}
+
+\stackMath
+\newcommand\tdd[3][1pt]{\tfrac{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle\partial#2}}}{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle\partial#3}}%
+}}
+
+% spaced fraction
+\stackMath
+\newcommand\sfrac[3][1pt]{\tfrac{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle#2}}}{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle#3}}%
+}}
+
+% decreases space between tilde and character its above
+\newcommand\stilde[1]{\smash{\tilde{#1}}}
+
+% label one equation in align
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% making smaller bullets in itemize environments
+\newlength{\mylen}
+\setbox1=\hbox{$\bullet$}\setbox2=\hbox{\tiny$\bullet$}
+\setlength{\mylen}{\dimexpr0.5\ht1-0.5\ht2}
+
+% fixed-width, aligned column types
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+% environments for questions and answers
+\newcounter{question}[section]
+\NewDocumentEnvironment{hwquestion}{o}
+    {
+        \refstepcounter{question}
+        \begin{tcolorbox}[
+            colback=tlightgreen,
+            colframe=tgreen,
+            opacityback=0.25,
+            title=\IfNoValueTF{#1}
+                {Question~\thequestion}
+                {Question~\thequestion \, - #1},
+            breakable,
+            enhanced jigsaw,
+            before upper={\parindent15pt} %-- add paragraph indents
+        ]
+    }
+    {
+        \end{tcolorbox}
+    }
+\newcounter{subquestion}[question]
+\NewDocumentEnvironment{hwsubquestion}{o}
+    {
+        \refstepcounter{subquestion}
+        \begin{tcolorbox}[
+            colback=tlightgreen,
+            colframe=tgreen,
+            opacityback=0.25,
+            title=\IfNoValueTF{#1}
+                {Question~\thequestion.\thesubquestion}
+                {Question~\thequestion.\thesubquestion \, - #1},
+            breakable,
+            enhanced jigsaw,
+            before upper={\parindent15pt} %-- add paragraph indents
+        ]
+    }
+    {
+        \end{tcolorbox}
+    }
+\newenvironment{hwanswer}
+    {
+        \vspace{2mm}
+        {\bfseries Answer}
+        \vspace{-\abovedisplayskip}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\textwidth,
+                colback=white,
+                colframe=white,
+                opacityback=0,
+                opacityframe=0,
+                boxrule=0pt,
+                frame hidden,
+                breakable,
+                before upper={\parindent15pt} %-- add paragraph indents
+            ]
+            \lineskip=0pt % smashes inline math to same line spacing
+    }
+    {
+        \end{tcolorbox}
+        \end{center}
+        \vspace{4mm}
+    }
+\newenvironment{hwquestiongroup}[1][\unskip]
+    {
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.90\linewidth,
+                colback=torange,
+                colframe=torange,
+                opacityback=0.25,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+\newenvironment{hwlemma}[1][\unskip]
+    {
+        \vspace{1mm}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\linewidth,
+                colback=tmarigold,
+                colframe=tmarigold,
+                opacityback=0.10,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+\newenvironment{hwdefinition}[1][\unskip]
+    {
+        \vspace{1mm}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\linewidth,
+                colback=tcoral,
+                colframe=tcoral,
+                opacityback=0.10,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+
+% environment for header that includes question numbers
+\newenvironment{hwheader}
+    {
+        \begin{flushright}
+            \begin{tcolorbox}[
+                width=0.55\textwidth,
+                colback=tlightblue,
+                colframe=tblue,
+                opacityback=0.25,
+                enhanced jigsaw
+            ]
+                \begin{flushright}
+                    Logan Hotz \\
+    }
+    {
+                \end{flushright}
+            \end{tcolorbox}
+        \end{flushright}
+        \vspace{4mm}
+    }
+
+
+
+
+
+\begin{document}
+
+
+
+    \begin{hwheader}
+        Stochastic Calculus for Finance II
+
+        Shreve
+    \end{hwheader}
+
+
+
+
+
+    %-- question 1
+    \begin{hwquestion}
+        Use the properties of Definition 1.1.2 for a probability measure $\P$, show the
+        following
+        \begin{enumerate}[(i), nolistsep]
+            \item If $A \in \cF, B \in \cF$, and $A \subset B$, then $\P(A) \leq \P(B)$.
+            \item If $A \in \cF$ and $\{ A_n \}_{n=1}^{\infty}$ is a sequence of sets in
+            $\cF$ with $\lim_{n \to \infty} \P(A_n) = 0$ and $A \subset A_n$ for every $n$,
+            then $\P(A) = 0$.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item Write $B$ as $B = A \cup (B \setminus A)$, and note that $A$ and $B
+            \setminus A$ are disjoint. From part (ii) of Definition 1.1.2, then, we have
+            $\P(B) = \P(A) + \P(B \setminus A)$. Because probabilities are weakly greater
+            than zero, $\P(B) = \P(A) + \P(B \setminus A) \geq \P(A)$, as desired.
+
+            \item From part (i), $\P(A) \leq \P(A_n)$ for all $n \in \mathbb{N}$. Again
+            making use of the fact $\P(A) \geq 0$, we have
+            \[
+                0
+                =
+                \lim_{n \to \infty} 0
+                \leq
+                \lim_{n \to \infty} \P(A)
+                \leq
+                \lim_{n \to \infty} \P(A_n)
+                = 0.
+            \]
+            Thus, $\lim_{n \to \infty} \P(A) = P(A) = 0$.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 2
+    \begin{hwquestion}
+        The infinite coin-toss space $\Omega_{\infty}$ of Example 1.1.4 is \emph{uncountably
+        infinite}. In other words, we cannot list all its elements in a sequence. To see
+        that this is impossible, suppose there such a sequential list of all elements of
+        $\Omega_{\infty}$:
+        \[
+            \begin{aligned}
+                \omega^{(1)}
+                &=
+                \omega_{1}^{(1)}
+                \omega_{2}^{(1)}
+                \omega_{3}^{(1)}
+                \omega_{4}^{(1)}
+                \, \cdots, \\
+                %
+                %
+                \omega^{(2)}
+                &=
+                \omega_{1}^{(2)}
+                \omega_{2}^{(2)}
+                \omega_{3}^{(2)}
+                \omega_{4}^{(2)}
+                \, \cdots, \\
+                %
+                %
+                \omega^{(3)}
+                &=
+                \omega_{1}^{(3)}
+                \omega_{2}^{(3)}
+                \omega_{3}^{(3)}
+                \omega_{4}^{(3)}
+                \, \cdots, \\
+                %
+                %
+                {}
+                &\vdots
+                {}
+            \end{aligned}
+        \]
+        An element that does not appear in this list is the sequence whose first component
+        is $H$ if $\omega_{1}^{(1)}$ is $T$ and is $T$ if $\omega_{1}^{(1)}$ is $H$, whose
+        second component is $H$ if $\omega_{2}^{(2)}$ is $T$ and is $T$ if $\omega_{2}^{
+        (2)}$ is $H$, whose third component is $H$ if $\omega_{3}^{(3)}$ is $T$ and is
+        $T$ if $\omega_{3}^{(3)}$ is $H$, etc. Thus, the list does not include every element
+        of $\Omega_{\infty}$.
+
+        Now consider the set of sequences of coin tosses in which the outcome on each
+        even-numbered toss matches the outcome of the toss preceding it, i.e.,
+        \[
+            A = \big\{
+                \omega =
+                \omega_1
+                \omega_2
+                \omega_3
+                \omega_4
+                \omega_5
+                \cdots
+                \, | \,
+                \omega_1
+                =
+                \omega_2
+                , \, 
+                \omega_3
+                =
+                \omega_4
+                \cdots
+            \big\}.
+        \]
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Show that $A$ is uncountably infinite.
+            \item Show that, when $0 < p < 1$, we have $\P(A) = 0$.
+        \end{enumerate}
+
+        \noindent Uncountably infinite sets can have any probability between zero and one,
+        including zero and one. The uncountability of a set does not determine its
+        probability.
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i), nolistsep]
+            \item We use the same type of diagonalization argument as we did for
+            $\Omega_{\infty}$.
+
+            Define the ``negation'' operator for coin flips as $\neg$ as $\neg H = T$ and
+            $\neg T = H$ for convenience. Suppose $L = \{ \omega^{(n)} \}$ is a sequential
+            list of all the elements of $A$, in the same manner as in the question
+            statement. Consider the element $\widetilde{\omega} \in \Omega_{\infty}$ with
+            the $n$-th coinflip given by $\widetilde{\omega}_{n} = \neg \omega_{2n-1}^{(n)}$.
+            That is, the $n$-th coinflip in $\widetilde{\omega}$ is the negation of the
+            $(2n-1)$-th paired coinflip of the $n$-th element of $L$. Clearly, $\widetilde{
+            \omega}$ is not in $L$, and thus $A$ is uncountably infinite.
+
+            \item Recall $p$ is the probability of a heads. For $n \in \mathbb{N}$, define
+            $
+            A_n = \big\{
+                \omega =
+                \omega_1
+                \omega_2
+                \cdots
+                \omega_{2n-1}
+                \omega_{2n}
+                \, | \,
+                \omega_1
+                =
+                \omega_2
+                \cdots
+                \omega_{2n-1}
+                =
+                \omega_{2n}
+                \cdots
+            \big\}
+            $
+            to be the set of $n$ paired coinflips. The sequence of sets $\{ A_n \}$
+            converges to $A$ as $n \to \infty$ Thus
+            \[
+                \P(A)
+                =
+                \lim_{n \to \infty} \P(A_n)
+                =
+                \lim_{n \to \infty}
+                \P(\omega_1 = \omega_2)
+                \times
+                \cdots
+                \times
+                \P(\omega_{2n-1} = \omega_{2n})
+                =
+                \lim_{n \to \infty}
+                \big[ p^2 + (1 - p)^2 \big]^n.
+            \]
+            For $0 < p < 1$, the term $p^2 + (1 - p)^2$ is strictly less than one. Thus
+            $\lim_{n \to \infty} \big[ p^2 + (1 - p)^2 \big]^n$ converges to zero, and
+            $\P(A) = 0$.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 3
+    \begin{hwquestion}
+        Consider the set function $\P$ defined for every subset of $[0, 1]$ by the formula
+        that $\P(A) = 0$ if $A$ is finite and $\P(A) = \infty$ if $A$ is an infinite set.
+        Show that $\P$ satisfies (1.1.3) - (1.1.5), but $\P$ does not have the countable
+        additive property (1.1.2). We see then that the finite additivity property (1.1.5)
+        does not imply the countable additivity property (1.1.2).
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        The four properties are:
+        \begin{itemize}
+            \item (1.1.2): Whenever $A_1, A_2, \dots$ is a sequence of disjoint sets in
+            $\cF$, then
+            \[
+                \P\left(
+                    \bigcup_{n=1}^{\infty} A_n
+                \right)
+                =
+                \sum_{n=1}^{\infty} \P(A_n).
+            \]
+            \item (1.1.3): $\P(\varnothing) = 0$.
+            \item (1.1.4): If $A$ and $B$ are disjoint sets in $\cF$, $\P(A \cup B) = \P(A)
+            + \P(B)$.
+            \item (1.1.5): If $A_1, A_2, \dots, A_N$ are finitely many disjoint sets in $\cF$,
+            then
+            \[
+                \P\left(
+                    \bigcup_{n=1}^{N} A_n
+                \right)
+                =
+                \sum_{n=1}^{N} \P(A_n).
+            \]
+        \end{itemize}
+
+        The empty set is finite, hence $\P(\varnothing) = 0$ is immediate.
+
+        Let $A, B \subseteq [0, 1]$. If $A$ and $B$ are finite, so too is $A \cup B$, so
+        that $\P(A \cup B) = 0 = 0 + 0 = \P(A) + \P(B)$. If instead $A$ is finite and $B$ is
+        infinite, so is $A \cup B$, meaning $\P(A \cup B) = \infty = 0 + \infty = \P(A) +
+        \P(B)$. The case where $A$ is infinite and $B$ is finite is similar. If both $A$ and
+        $B$ are infinite, then so too is $A \cup B$. Thus $\P(A \cup B) = \infty = \infty +
+        \infty = \P(A) + \P(B)$.
+
+        Let $A_1, \dots A_N$ be a collection of disjoint sets in $[0, 1]$. If at least one
+        of the $A_n$ is infinite, then $\cup_{n} A_n$ is as well. Thus
+        $%\[
+            \P\left(
+                \cup_{n=1}^{N} A_n
+            \right)
+            =
+            \infty
+            =
+            \sum_{n=1}^{N} A_n.
+        $%\]
+        If instead all the $A_{n}$ are finite, then the finite union $\cup_{n} A_n$ is too.
+        Therefore we can iteratively apply (1.1.4) to $\cup_{n} A_n$ to deduce that the
+        probability of the union and the sum of the individual probabilities are both zero.
+
+        To show that this set function does not satisfy the countable additivity property,
+        let $A_{n} = \nicefrac{1}{n}$ for $n \in \mathbb{N}$. Then $\P(A_{n}) = 0$ for all
+        $n$, but $A = \cup_{n} A_{n} = \{ \nicefrac{1}{n} \, | \, n \in \mathbb{N} \}$ is an
+        infinite set, and thus we have $\P(A) = \infty$.
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 4
+    \begin{hwquestion}
+        \begin{enumerate}[(i), nolistsep]
+            \item Construct a standard normal random variable $Z$ on the probability space
+            $(\Omega_{\infty}, \cF_{\infty}, \P)$ of Example 1.1.4 under the assumption that
+            the probability for heads is $p = \nicefrac{1}{2}$.
+
+            \item Define a sequence of random variables $\{ Z_n \}_{n=1}^{\infty}$ on
+            $\Omega_{\infty}$ such that
+            \[
+                \lim_{n \to \infty} Z_n(\omega) = Z(\omega)
+                \quad \text{ for every } \quad
+                \omega \in \Omega_{\infty}
+            \]
+            and, for each $n$, $Z_n$ depends only on the first $n$ coin tosses. (This gives
+            us a procedure for approximating a standard normal random variable by random
+            variables generated by a finite number of coin tosses, a useful algorithm for
+            Monte Carlo simulation.)
+        \end{enumerate}
+    \end{hwquestion}
+
+
+
+
+
+\end{document}

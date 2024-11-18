@@ -1,0 +1,2408 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[left=1.0in, top=1.0in, bottom=1.0in, right=1.0in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{bbm, bm}                     % blackboard and bold fonts
+\usepackage{mathtools}                   % provides starred version of bmatrix. loads amsmath
+\usepackage{float}                       % more exact placement of figures
+\usepackage{array}                       % justification of fixed-width columns & matrices
+\usepackage{arydshln}                    % dashed lines in matrices
+\usepackage{titlesec}                    % change title formats
+\usepackage[most, breakable]{tcolorbox}  % nicely colored boxes (most allows for no frames)
+\usepackage[shortlabels]{enumitem}       % change enumerate symbols
+\usepackage{nicefrac}                    % small in-line fractions
+\usepackage{booktabs}                    % nice table properties, e.g. toprule & bottomrule
+\usepackage{wasysym}                     % larger set of glyphs for, e.g. binary relations
+\usepackage[bottom]{footmisc}            % put footnote in environment at bottom of page
+\usepackage{threeparttable}              % notes at the table
+% \usepackage[capposition=top]{floatrow}   % `floatfoot` command for figure notes
+
+\usepackage{tikz}       % drawing stuff
+\usetikzlibrary{matrix} % drawing matrices
+
+\usepackage{stackengine, scalerel} % adding some padding in fractions
+
+\usepackage{siunitx}
+\sisetup{
+    per-mode = symbol,
+    output-decimal-marker = {.},
+    % group-minimum-digits = 4,
+    input-symbols = (),
+    range-units = brackets,
+    list-final-separator = { \translate{and} },
+    list-pair-separator = { \translate{and} },
+    range-phrase = { \translate{to (numerical range)} },
+}
+
+%-- enumerate options
+\setlist{
+    listparindent=\parindent,
+    parsep=0pt
+}
+
+
+% trinidad colors
+\definecolor{tgreen}{RGB}{57, 115, 82}
+\definecolor{tlightgreen}{RGB}{121, 217, 163}
+\definecolor{tmarigold}{RGB}{242, 159, 5}
+\definecolor{torange}{RGB}{217, 103, 4}
+\definecolor{tred}{RGB}{115, 32, 2}
+\definecolor{tcoral}{RGB}{242, 121, 131}
+\definecolor{tblue}{RGB}{12, 99, 102}
+\definecolor{tlightblue}{RGB}{20, 161, 166}
+\definecolor{tlava}{RGB}{73, 65, 55}
+\definecolor{tcoffee}{RGB}{58, 48, 45}
+
+
+
+\titleformat{\section}
+    {\large\scshape}{\thesection}{1em}{}
+\titleformat{\subsection}
+    {\large\scshape}{\thesubsection}{1em}{}
+
+% allows equation and align environments to break over pages
+\allowdisplaybreaks
+
+% faster way of writing a norm
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+%vectors with angle, parenthesis, & bracket delimiters
+\newcommand\avec[1]{\left\langle#1\right\rangle}
+\newcommand\pvec[1]{\left(#1\right)}
+\newcommand\bvec[1]{\left[#1\right]}
+
+% argmin and argmax operators
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+% shortening varepsilon
+\newcommand\ve{\varepsilon}
+
+% shortening common bold-faced letters and variance
+\newcommand\E{\mathbb{E}}
+\newcommand\R{\mathbb{R}}
+\newcommand\Var{\text{Var}}
+\newcommand\Cov{\text{Cov}}
+\renewcommand\P{\mathbb{P}} % \P is the paragraph symbol by default
+
+\newcommand\cF{\mathcal{F}}
+
+% succsim & precsim with slashes through it
+%   https://tex.stackexchange.com/a/479194
+\makeatletter
+\newcommand\nsuccsim{\mathrel{\mathpalette\varn@t\succsim}}
+\newcommand\nprecsim{\mathrel{\mathpalette\varn@t\precsim}}
+\newcommand\varn@t[2]{%
+    \vphantom{/{#2}}%
+    \ooalign{\hfil$\m@th#1/\mkern2mu$\cr\hfil$\m@th#1#2$\hfil\cr}%
+}
+\makeatother
+
+% partial derivatives
+\newcommand\dd[2]{\frac{\partial#1}{\partial#2}}
+\newcommand\ndd[2]{\nicefrac{\partial#1}{\partial#2}}
+
+\stackMath
+\newcommand\tdd[3][1pt]{\tfrac{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle\partial#2}}}{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle\partial#3}}%
+}}
+
+% spaced fraction
+\stackMath
+\newcommand\sfrac[3][1pt]{\tfrac{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle#2}}}{%
+    \ThisStyle{\addstackgap[#1]{\SavedStyle#3}}%
+}}
+
+% decreases space between tilde and character its above
+\newcommand\stilde[1]{\smash{\tilde{#1}}}
+
+% label one equation in align
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% making smaller bullets in itemize environments
+\newlength{\mylen}
+\setbox1=\hbox{$\bullet$}\setbox2=\hbox{\tiny$\bullet$}
+\setlength{\mylen}{\dimexpr0.5\ht1-0.5\ht2}
+
+% fixed-width, aligned column types
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+% environments for questions and answers
+\newcounter{question}[section]
+\NewDocumentEnvironment{hwquestion}{o}
+    {
+        \refstepcounter{question}
+        \begin{tcolorbox}[
+            colback=tlightgreen,
+            colframe=tgreen,
+            opacityback=0.25,
+            title=\IfNoValueTF{#1}
+                {Question~\thequestion}
+                {Question~\thequestion \, - #1},
+            breakable,
+            enhanced jigsaw,
+            before upper={\parindent15pt} %-- add paragraph indents
+        ]
+    }
+    {
+        \end{tcolorbox}
+    }
+\newcounter{subquestion}[question]
+\NewDocumentEnvironment{hwsubquestion}{o}
+    {
+        \refstepcounter{subquestion}
+        \begin{tcolorbox}[
+            colback=tlightgreen,
+            colframe=tgreen,
+            opacityback=0.25,
+            title=\IfNoValueTF{#1}
+                {Question~\thequestion.\thesubquestion}
+                {Question~\thequestion.\thesubquestion \, - #1},
+            breakable,
+            enhanced jigsaw,
+            before upper={\parindent15pt} %-- add paragraph indents
+        ]
+    }
+    {
+        \end{tcolorbox}
+    }
+\newenvironment{hwanswer}
+    {
+        \vspace{2mm}
+        {\bfseries Answer}
+        \vspace{-\abovedisplayskip}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\textwidth,
+                colback=white,
+                colframe=white,
+                opacityback=0,
+                opacityframe=0,
+                boxrule=0pt,
+                frame hidden,
+                breakable,
+                before upper={\parindent15pt} %-- add paragraph indents
+            ]
+            \lineskip=0pt % smashes inline math to same line spacing
+    }
+    {
+        \end{tcolorbox}
+        \end{center}
+        \vspace{4mm}
+    }
+\newenvironment{hwquestiongroup}[1][\unskip]
+    {
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.90\linewidth,
+                colback=torange,
+                colframe=torange,
+                opacityback=0.25,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+\newenvironment{hwlemma}[1][\unskip]
+    {
+        \vspace{1mm}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\linewidth,
+                colback=tmarigold,
+                colframe=tmarigold,
+                opacityback=0.10,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+\newenvironment{hwdefinition}[1][\unskip]
+    {
+        \vspace{1mm}
+        \begin{center}
+            \begin{tcolorbox}[
+                width=0.95\linewidth,
+                colback=tcoral,
+                colframe=tcoral,
+                opacityback=0.10,
+                title= #1,
+                breakable,
+                enhanced jigsaw
+            ]
+    }
+    {
+            \end{tcolorbox}
+        \end{center}
+    }
+
+% environment for header that includes question numbers
+\newenvironment{hwheader}
+    {
+        \begin{flushright}
+            \begin{tcolorbox}[
+                width=0.55\textwidth,
+                colback=tlightblue,
+                colframe=tblue,
+                opacityback=0.25,
+                enhanced jigsaw
+            ]
+                \begin{flushright}
+                    Logan Hotz \\
+    }
+    {
+                \end{flushright}
+            \end{tcolorbox}
+        \end{flushright}
+        \vspace{4mm}
+    }
+
+
+
+
+
+\begin{document}
+
+
+
+    \begin{hwheader}
+        Stochastic Calculus for Finance II
+
+        Shreve
+    \end{hwheader}
+
+
+
+
+
+    %-- question 1
+    \begin{hwquestion}
+        According to Definition 3.3.3(iii), for $0 \leq t < u$, the Brownian motion
+        increment $W(u) - W(t)$ is independent of the $\sigma$-algebra $\cF(t)$. Use this
+        property and property (i) of that definition to show that, for $0 \leq t < u_1 <
+        u_2$, the increment $W(u_2) - W(u_1)$ is also independent of $\cF(t)$.
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        From property (iii) of the Definition 3.3.3, we can deduce that $W(u_2) - W(u_1)$
+        is independent of the $\sigma$-algebra $\cF(u_1)$. Stated in terms of events in the
+        sample space, this independence means that
+        \[
+            \P(A \cap B) = \P(A) \P(B)
+            \quad \text{ for all } \quad
+            A \in \cF(u_1), B \in \sigma(W(u_2) - W(u_1)).
+        \]
+        Moreover, because information in a filtration accumulates, $\cF(t) \subseteq
+        \cF(u_1)$, the property above must hold for all $A \in \cF(t), B \in \sigma(W(u_2)
+        - W(u_1))$. Thus we conclude $W(u_2) - W(u_1)$ is independent of $\cF(t)$.
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 2
+    \begin{hwquestion}
+        Let $W(t), t \geq 0$, be a Brownian motion, and let $\cF(t), t \geq 0$ be a
+        filtration for this Brownian motion. Show that $W^2(t) - t$ is a martingale.
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        The process $V(t) = W^2(t) - t$ is a martingale if, for $0 \leq s \leq t$,
+        $\E[V(t) \, | \, \cF(s)] = V(s)$. Take $0 \leq s \leq t$ as given, and note that
+        $W^2(t) = \big[ (W(t) - W(s)) + W(s) \big]^2$, which we can further rearrange to
+        resemble
+        \[
+            \begin{aligned}
+                W^2(t)
+                &=
+                \big( W(t) - W(s) \big)^2 + 2\big(W(t) - W(s)\big) W(s) + W^2(s)
+                \\
+                %
+                %
+                &=
+                \big( W(t) - W(s) \big)^2 + 2W(t)W(s) - W^2(s)
+            \end{aligned}
+        \]
+        Now consider
+        \[
+            \begin{aligned}
+                \E\big[ W^2(t) - t \, | \, \cF(s) \big]
+                &=
+                \E\left[
+                    \big( W(t) - W(s) \big)^2 + 2W(t)W(s) - W^2(s) - t
+                    \, | \,
+                    \cF(s)
+                \right]
+                \\
+                %
+                %
+                &=
+                \E\left[
+                    \big( W(t) - W(s) \big)^2
+                    \, | \,
+                    \cF(s)
+                \right]
+                +
+                2 W(s) \E \big[ W(t) \, | \, \cF(s) \big]
+                -
+                t
+                -
+                W^2(s).
+            \end{aligned}
+        \]
+        Recall that, $W(u)$ is $\cF(u)$-measureable, so that $W(s)$ can be treated as a
+        constant when taking expectations conditional on $\cF(s)$. Also, the $t$ term is
+        not a random variable, and can be extracted from the expectations operator without
+        difficulty. The first term above, $\E\big[ (W(t) - W(s))^2 \, | \, \cF(s) \big]$, is
+        the variance of the Brownian incrememnt from time-$s$ to time-$t$. Since $W$ is a
+        martingale, $\E\big[W(t) \, | \, \cF(s)\big] = W(s)$. Thus we have
+        \[
+            \E\big[ W^2(t) - t \, | \, \cF(s) \big]
+            =
+            (t - s)
+            +
+            2 W^2(s) - t - W^2(s)
+            =
+            W^2(s) - s,
+        \]
+        as desired.
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 3
+    \begin{hwquestion}[Normal Kurtosis]
+        The \emph{kurtosis} of a random variable is defined to be the ratio of its fourth
+        central moment to the square of its variance. For a normal random variable, the
+        kurtosis is $3$. This fact was used to obtain (3.4.7). This exercise verifies that
+        fact.
+
+        Let $X$ be a normal random variable with mean $\mu$, so that $X - \mu$ has mean
+        zero. Let the variance of $X$, which is also the variance of $X - \mu$, be
+        $\sigma^2$. In (3.2.13), we computed the moment-generating function of $X - \mu$
+        to be $\varphi(u) = \E[e^{u(X - \mu)}] = e^{\frac{1}{2}\sigma^2 u^2}$, where $u$
+        is a real variable. Differentiating this function with respect to $u$, we obtain
+        \[
+            \varphi'(u)
+            =
+            \E\left[
+                (X - \mu) e^{u(X - \mu)}
+            \right]
+            =
+            \sigma^2 u e^{\frac{1}{2} \sigma^2 u^2},
+        \]
+        and, in particular, $\varphi'(0) = \E[X - \mu] = 0$. Differentiating once again,
+        we obtain
+        \[
+            \varphi''(u)
+            =
+            \E\left[
+                (X - \mu)^2 e^{u(X - \mu)}
+            \right]
+            =
+            (\sigma^2 + \sigma^4 u^2) e^{\frac{1}{2}\sigma^2 u^2},
+        \]
+        and, in particular, $\varphi''(0) = \E[(X - \mu)^2] = \sigma^2$. Differentiate two
+        more ties and obtain the normal kurtosis formula $\E[(X - \mu)^4] = 3 \sigma^4$.
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        The third derivative of the moment-generating function is
+        \[
+            \varphi^{(3)}(u)
+            =
+            (2 \sigma^4 u)
+            e^{\frac{1}{2} \sigma^2 u^2}
+            +
+            (\sigma^2 + \sigma^4 u^2) \left( \sfrac{1}{2} \sigma^2 2 u \right)
+            e^{\frac{1}{2} \sigma^2 u^2}
+            =
+            \big(
+                3 \sigma^4 u
+                +
+                \sigma^6 u^3
+            \big)
+            e^{\frac{1}{2} \sigma^2 u^2},
+        \]
+        and its fourth derivative is
+        \[
+            \begin{aligned}
+                \varphi^{(4)}(u)
+                &=
+                (3 \sigma^4 + 3 \sigma^6 u^2)
+                e^{\frac{1}{2} \sigma^2 u^2}
+                +
+                \big(
+                    3 \sigma^4 u
+                    +
+                    \sigma^6 u^3
+                \big)
+                \left( \sfrac{1}{2} \sigma^2 2 u \right)
+                e^{\frac{1}{2} \sigma^2 u^2}
+                \\
+                %
+                %
+                &=
+                \big(
+                    3 \sigma^4
+                    +
+                    6 \sigma^6 u^2
+                    +
+                    \sigma^8 u^4
+                \big)
+                e^{\frac{1}{2} \sigma^2 u^2}.
+            \end{aligned}
+        \]
+        Evaluating this at $u = 0$, we have $\varphi^{(4)}(0) = \E\big[(X - \mu)^4\big] =
+        3 \sigma^4$. Dividing this fourth central moment by its squared variance,
+        $\sigma^4$, we can confirm the kurtosis of a normal random variable is three.
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 4
+    \begin{hwquestion}[Other variations of Brownian Motion]
+        Theorem 3.4.3 asserts that if $T$ is a positive number and we choose a partition
+        $\Pi$ with points $0 = t_0 < t_1 < t_2 < \cdots < t_n = T$, then as the number $n$
+        of partition points approaches infinity and the length of the longest subinterval
+        $\norm{\Pi}$ approaches zero, the sample quadratic variation
+        \[
+            \sum_{j=0}^{n-1}
+            \big[
+                W(t_{j+1}) - W(t_{j})
+            \big]^2
+        \]
+        approaches $T$ for almost every path of the Brownian motion $W$. In Remark 3.4.5,
+        we further showed that $\sum_{j=0}^{n-1} [W(t_{j+1}) - W(t_{j})] (t_{j+1}-t_{j})$
+        and $\sum_{j=0}^{n-1} (t_{j+1}-t_{j})^2$ have limit zero. We summarize these facts
+        by the multiplication rules
+        \[
+            dW(t) dW(t) = dt,
+            \qquad
+            dW(t) dt = 0,
+            \qquad
+            dt dt = 0.
+        \]
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Show that as the number $n$ of partition points approaches infinity and
+            the length of the longest subinterval approaches zero, the sample first
+            variation
+            \[
+                \sum_{j=0}^{n-1}
+                \big|
+                    W(t_{j+1}) - W(t_{j})
+                \big|
+            \]
+            approaches $\infty$ for almost every path of the Brownian motion $W$.
+            \item Show that as the number $n$ of partition points approaches infinity and
+            the length of the longest subinterval approaches zero, the sample cubic
+            variation
+            \[
+                \sum_{j=0}^{n-1}
+                \big|
+                    W(t_{j+1}) - W(t_{j})
+                \big|^3
+            \]
+            approaches zero for almost every path of the Brownian motion $W$.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item For an $n$-partition $\Pi$ with points $0 = t_0 < t_1 < \cdots < t_n = T$,
+            define
+            \[
+                Q_{\Pi}^{1}
+                =
+                \sum_{j=0}^{n-1} | W(t_{n+1}) - W(t_{n}) |.
+            \]
+            Towards a contradiction, suppose $Q_{\Pi}^{1} \xrightarrow{\text{a.s.}} Q$ for
+            some real number $Q$ as $\norm{\Pi} \to 0$. Note
+            \[
+                \sum_{j=0}^{n-1}
+                \left[ W(t_{n+1}) - W(t_{n}) \right]^2
+                \leq
+                \left(
+                    \max_{0 \leq k \leq n - 1}
+                    |W(t_{n+1}) - W(t_{n})|
+                \right)
+                Q_{\Pi}^{1}.
+            \]
+            As $W$ is continuous with respect to time, $|W(t_{n+1}) - W(t_{n})| \to 0$ as
+            $\norm{\Pi} \to 0$. The left-hand side of the inequality above converges to $T$,
+            whereas the right-hand side converges to $(0) (Q)$ by supposition. This is a
+            contradiction; hence $Q_{\Pi}^{1}$ diverges to infinity.
+
+            \item Define
+            \[
+                Q_{\Pi}^{3}
+                =
+                \sum_{j=0}^{n-1} |W(t_{n+1}) - W(t_n)|^3
+            \]
+            and note that
+            \[
+                Q_{\Pi}^{3}
+                \leq
+                \left(
+                    \max_{0 \leq k \leq n - 1}
+                    |W(t_{n+1}) - W(t_{n})|
+                \right)
+                \sum_{j=0}^{n-1} |W(t_{n+1}) - W(t_n)|^2.
+            \]
+            The first term converges to zero; the second to $T$. Hence $Q_{\Pi}^{3}$
+            converges to zero almost surely.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+
+    %-- question 5
+    \begin{hwquestion}[Black-Scholes-Merton Formula]
+        Let the interest rate $r$ and the volatility $\sigma > 0$ be constant. Let
+        \[
+            S(t)
+            =
+            S(0) \exp\left[
+                \left( r - \sfrac{1}{2} \sigma^2 \right) t
+                +
+                \sigma W(t)
+            \right]
+        \]
+        be a geometric Brownian motion with mean rate of return $r$, where the initial
+        stock price $S(0)$ is positifve. Let $K$ be a positive constant. Show that, for
+        $T > 0$,
+        \[
+            \E\left[
+                e^{-rT}
+                \big( S(T) - K \big)^{+}
+            \right]
+            =
+            S(0) N\big(d_{+}(T, S(0))\big)
+            -
+            K e^{-rT} N\big(d_{-}(T, S(0))\big),
+        \]
+        where
+        \[
+            \big(x\big)^{+}
+            =
+            \max\{ x, 0 \},
+            \qquad
+            d_{\pm}\big(T, S(0)\big)
+            =
+            \sfrac{1}{\sigma\sqrt{T}}
+            \left[
+                \ln \sfrac{S(0)}{K}
+                +
+                \left(
+                    r \pm \sfrac{\sigma^2}{2}
+                \right) T
+            \right],
+        \]
+        and $N$ is the cumulative standard normal distribution function
+        \[
+            N(y)
+            =
+            \sfrac{1}{\sqrt{2\pi}}
+            \int_{-\infty}^{y}
+            e^{-\frac{1}{2}z^2} \, \text{d} z
+            =
+            \sfrac{1}{\sqrt{2\pi}}
+            \int_{-y}^{\infty}
+            e^{-\frac{1}{2}z^2} \, \text{d} z.
+        \]
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        We take expectations with respect to $W(T)$, that is, with respect to the Brownian
+        motion of length $T$, which has density $p(w) = (2\pi T)^{-1/2} e^{-(2T)^{-1}
+        w^{2}}$. Hence,
+        \[
+            \E\left[
+                e^{-rT}
+                \big( S(T) - K \big)^{+}
+            \right]
+            =
+            \sfrac{
+                e^{-rT}
+            }{
+                \sqrt{ 2 \pi T }
+            }
+            \int_{-\infty}^{\infty}
+            \left\{
+                S(0)
+                \exp\left[
+                    \left( r - \sfrac{1}{2} \sigma^2 \right) T
+                    +
+                    \sigma w
+                \right]
+                - K
+            \right\}^{+}
+            e^{-\frac{w^2}{2T}}
+            \,
+            \text{d} w.
+        \]
+        The integrand is zero for all $w < w^*$, where $w^*$ satisfies
+        \[
+            S(0) \exp\left[
+                \left( r - \sfrac{1}{2} \sigma^2 \right) T
+                +
+                \sigma w^*
+            \right]
+            =
+            K
+            \quad \iff \quad
+            w^*
+            =
+            \sfrac{1}{\sigma}
+            \left[
+                \ln \sfrac{K}{S(0)}
+                -
+                \left( r - \sfrac{1}{2} \sigma^2 \right) T
+            \right],
+        \]
+        meaning we can further rewrite the discounted expected value of the call option as
+        \[
+            \begin{aligned}
+                \E \left[
+                    e^{-rT}
+                    \big( S(T) - K \big)^{+}
+                \right]
+                &=
+                \sfrac{
+                    e^{-rT}
+                }{
+                    \sqrt{ 2 \pi T }
+                }
+                \int_{w^*}^{\infty}
+                \left\{
+                    S(0) \exp\left[
+                        \left( r - \sfrac{1}{2} \sigma^2 \right) T
+                        +
+                        \sigma w
+                    \right]
+                    - K
+                \right\}
+                e^{-\frac{w^2}{2T}}
+                \,
+                \text{d} w
+                \\
+                %
+                %
+                &=
+                \sfrac{
+                    e^{-rT}
+                }{
+                    \sqrt{ 2 \pi T }
+                }
+                S(0)
+                \int_{w^*}^{\infty}
+                \exp\left[
+                    \left(r - \sfrac{1}{2}\sigma^2\right)T
+                    +
+                    \sigma w
+                    -
+                    \sfrac{w^2}{2T}
+                \right]
+                \, \text{d} w
+                \\
+                %
+                &\qquad\qquad
+                - 
+                \sfrac{
+                    e^{-rT}
+                }{
+                    \sqrt{ 2 \pi T }
+                }
+                K
+                \int_{w^*}^{\infty}
+                e^{-\frac{w^2}{2T}}
+                \, \text{d} w
+            \end{aligned}
+        \]
+        Making the change of variables $z = T^{-1/2} w$ to the second integral, we see it
+        reduces to
+        \[
+            K e^{-rT} \sfrac{1}{\sqrt{2 \pi T}}
+            \int_{w^*}^{\infty}
+            e^{-\frac{w^2}{2T}}
+            \, \text{d} w
+            =
+            K e^{-rT} \sfrac{1}{\sqrt{2 \pi T}}
+            \int_{T^{-1/2} w^*}^{\infty}
+            e^{-\frac{z^2}{2}}
+            \sqrt{T}
+            \, \text{d} z
+            =
+            K e^{-rT} N\left( -\sfrac{w^*}{\sqrt{T}} \right).
+        \]
+
+        The exponent in the first integral above can be rewritten via completing the square
+        as
+        \[
+            -\sfrac{w^2}{2T}
+            +
+            \sigma w
+            +
+            \left( r - \sfrac{1}{2}\sigma^2 \right) T
+            =
+            -\sfrac{1}{2T} ( w - \sigma T )^2 + r T.
+        \]
+        Hence,
+        \[
+            \begin{multlined}
+                S(0) e^{-rT} \sfrac{1}{\sqrt{2 \pi T}}
+                \int_{w^*}^{\infty}
+                \exp\left[
+                    \left(r - \sfrac{1}{2} \sigma^2\right) T
+                    +
+                    \sigma w
+                    -
+                    \sfrac{w^2}{2T}
+                \right]
+                \, \text{d} w
+                =
+                \\
+                %
+                %
+                S(0) e^{-rT} \sfrac{1}{\sqrt{2 \pi T}}
+                \int_{w^*}^{\infty}
+                e^{-\frac{1}{2T} (w - \sigma T)^2} e^{rT}
+                \, \text{d} w
+                =
+                S(0) \sfrac{1}{\sqrt{2 \pi T}}
+                \int_{w^*}^{\infty}
+                e^{-\frac{1}{2T} (w - \sigma T)^2}
+                \, \text{d} w.
+            \end{multlined}
+        \]
+        Adopting a similar transformation as above, $z = T^{-1/2} (w - \sigma T)$, this
+        integral simplifies to
+        \[
+            S(0) \sfrac{1}{\sqrt{2 \pi T}}
+            \int_{w^*}^{\infty}
+            e^{-\frac{1}{2T} (w - \sigma T)^2}
+            \, \text{d} w
+            =
+            S(0) \sfrac{1}{\sqrt{2 \pi}}
+            \int_{\frac{w^* - \sigma T}{\sqrt{T}}}^{\infty}
+            e^{-\frac{z^2}{2}}
+            \sqrt{T}
+            \, \text{d} z
+            =
+            S(0) N\left( - \sfrac{ w^* - \sigma T }{ \sqrt{T} } \right).
+        \]
+        Finally,
+        \[
+            \begin{aligned}
+                -\sfrac{w^*}{\sqrt{T}}
+                &=
+                \sfrac{1}{\sigma \sqrt{T}}
+                \left[
+                    \ln \sfrac{S(0)}{K}
+                    +
+                    \left( r - \sfrac{1}{2} \sigma^2 \right) T
+                \right]
+                =
+                d_{-}\big(T, S(0)\big)
+                \\
+                %
+                %
+                -\sfrac{w^* - \sigma T}{\sqrt{T}}
+                &=
+                \sfrac{1}{\sigma \sqrt{T}}
+                \left[
+                    \ln \sfrac{S(0)}{K}
+                    +
+                    \left( r - \sfrac{1}{2} \sigma^2 \right) T
+                \right]
+                +
+                \sigma \sqrt{T}
+                =
+                d_{+}\big(T, S(0)\big).
+            \end{aligned}
+        \]
+        Thus we conclude
+        \[
+            \E\left[
+                e^{-rT}
+                \big( S(T) - K \big)^{+}
+            \right]
+            =
+            S(0) N\big(d_{+}(T, S(0))\big)
+            -
+            K e^{-rT} N\big(d_{-}(T, S(0))\big).
+        \]
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 6
+    \begin{hwquestion}
+        Let $W(t)$ be a Brownian motion and let $\cF(t), t \geq 0$, be an associated
+        filtration.
+        \begin{enumerate}[(i), nolistsep]
+            \item For $\mu \in \R$, consider the \emph{Brownian motion with drift} $\mu$:
+            \[
+                X(t) = \mu t + W(t).
+            \]
+            Show that for any Borel-measurable function $f(y)$, and for any $0 \leq s < t$,
+            the function
+            \[
+                g(x)
+                =
+                \sfrac{1}{\sqrt{2\pi(t - s)}}
+                \int_{-\infty}^{\infty}
+                f(y)
+                \exp\left\{
+                    - \frac{
+                        \big( y - x - \mu(t - s) \big)^2
+                    }{
+                        2(t - s)
+                    }
+                \right\}
+                \, \text{d} y
+            \]
+            satisfies $\E[ f(X(t)) \, | \, \cF(s) ] = g(X(s))$ and hence $X$ has the Markov
+            property.
+
+            We may rewrite $g(x)$ as $g(x) = \infty_{-\infty}^{\infty} f(y) p(\tau, x,
+            y) \, \text{d} y$, where $\tau = t - s$ and
+            \[
+                p(\tau, x, y)
+                =
+                \sfrac{1}{\sqrt{2\pi\tau}}
+                \exp\left\{
+                    -\frac{( y - x - \mu \tau)^2}{2 \tau}
+                \right\}
+            \]
+            is the \emph{transition density} for Brownian motion with drift $\mu$.
+
+            \item For $\nu \in \R$ and $\sigma > 0$, consider the \emph{geometric Brownian
+            motion}
+            \[
+                S(t)
+                =
+                S(0) e^{\sigma W(t) + \nu t}.
+            \]
+            Let $\tau = t - s$ and
+            \[
+                p(\tau, x, y)
+                =
+                \sfrac{1}{\sigma y \sqrt{2\pi\tau}}
+                \exp\left\{
+                    \frac{
+                        \left( \log (\nicefrac{y}{x}) - \nu \tau \right)^2
+                    }{
+                        2 \sigma^2 \tau
+                    }
+                \right\}.
+            \]
+            Show that for any Borel-measurable function $f(y)$ and for any $0 \leq s < t$
+            the function $g(x) = \int_{0}^{\infty} h(y) p(\tau, x, y) \, \text{d} y$
+            satisfies $\E[f(S(t)) \, | \, \cF(s)] = g(S(s))$ and hence $S$ has the Markov
+            property and $p(\tau, x, y)$ is its transition density.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        Throughout, let $f$ be a Borel-measurable function and let $t, s \in \R$ abide by $0
+        \leq s < t$.
+
+        \begin{enumerate}[(i)]
+            \item To begin, note that
+            \[
+                \E\big[
+                    f( X(t) )
+                    \, \big| \,
+                    \cF(s)
+                \big]
+                =
+                \E\Big[
+                    f\big( X(t) - X(s) + X(s) \big)
+                    \, \Big| \,
+                    \cF(s)
+                \Big].
+            \]
+            Because $X(t) - X(s)$ is independent of $\cF(s)$ and $X(s)$ is
+            $\cF(s)$-measurable, we can apply the Independence Lemma. To that end, define
+            the function $g$ as
+            \[
+                g(x)
+                =
+                \E\big[
+                    f( X(t) - X(s) + x )
+                \big]
+                =
+                \E\Big[
+                    f\big( (W(t)-W(s)) + \mu(t - s) + x \big)
+                \Big].
+            \]
+            Recognizing that $W(t) - W(s)$ is normally distributed with mean zero and
+            variance $\tau \equiv t - s$, we can reexpress $g$ as
+            \[
+                \begin{aligned}
+                    g(x)
+                    &=
+                    \sfrac{1}{\sqrt{2\pi\tau}}
+                    \int_{-\infty}^{\infty}
+                    f(z + \mu\tau + x)
+                    \exp\left\{
+                        -\sfrac{
+                            z^2
+                        }{
+                            2 \tau
+                        }
+                    \right\}
+                    \, \text{d} z.
+                    \\
+                    %
+                    %
+                    &=
+                    \sfrac{1}{\sqrt{2\pi\tau}}
+                    \int_{-\infty}^{\infty}
+                    f(y)
+                    \exp\left\{
+                        -\frac{
+                            (y - x - \mu\tau)^2
+                        }{
+                            2 \tau
+                        }
+                    \right\}
+                    \, \text{d} y
+                    =
+                    \int_{-\infty}^{\infty}
+                    f(y) p(\tau, x, y) \, \text{d} y,
+                \end{aligned}
+            \]
+            where the second equality makes use of the substitution $y = z + \mu\tau + x$.
+            Taking $x = X(s)$, we can confirm $X$ has the Markov property.
+
+            \item We first express $S(t)$ in terms of the Brownian motion with drift
+            parameter $\mu = \nicefrac{\nu}{\sigma}$, i.e. $X(t) = (\nicefrac{\nu}{\sigma})
+            t + W(t)$:
+            \[
+                S(t)
+                =
+                S(0) \exp \big[ 
+                    \sigma W(t) + \nu t
+                \big]
+                =
+                S(0) \exp \big[
+                    \sigma ( W(t) + \mu t )
+                \big]
+                =
+                S(0) e^{\sigma X(t)}
+            \]
+            Applying the result from part (i) to $S(t) = S(0) e^{\sigma X(t)}$, immediately
+            we have
+            \[
+                \E\big[
+                    f(S(t))
+                    \, | \,
+                    \cF(s)
+                \big]
+                =
+                \int_{-\infty}^{\infty}
+                f(\left( S(0) e^{\sigma z} \right)
+                \sfrac{1}{\sqrt{2\pi(t-s)}}
+                \exp\left\{
+                    -\sfrac{
+                        (z - X(s) - \mu(t - s))^2
+                    }{
+                        2 (t - s)
+                    }
+                \right\}
+                \, \text{d} z.
+            \]
+            Define $\tau \equiv t - s$ and make the substitution $y = S(0) e^{\sigma z}$, so
+            that $\text{d} y = S(0) e^{\sigma z} \sigma \text{d} z = y \sigma \text{d} z$.
+            The conditional expectation is then written
+            \[
+                \int_{0}^{\infty}
+                f(y)
+                \sfrac{1}{\sqrt{2\pi\tau}}
+                \exp\left\{
+                    -\frac{
+                        (\sigma^{-1} ( \ln y - \ln S(0) ) - X(s) - \mu\tau)^2
+                    }{
+                        2 \tau
+                    }
+                \right\}
+                \sfrac{1}{y \sigma}
+                \, \text{d} y.
+            \]
+            The numerator in the exponential term can be more compactly expressed as
+            \[
+                \begin{multlined}
+                    \sigma^{-1}
+                    \left(
+                        \ln y - \ln S(0)
+                    \right)
+                    -
+                    \sigma^{-1}
+                    \left(
+                        \ln S(s) - \ln S(0)
+                    \right)
+                    -
+                    \mu \tau
+                    %
+                    %
+                    =
+                    \sigma^{-1}
+                    \big[
+                        \ln y - \ln S(s) - \nu \tau
+                    \big].
+                \end{multlined}
+            \]
+            Thus,
+            \[
+                \begin{aligned}
+                    \E\big[
+                        f(S(t))
+                        \, | \,
+                        \cF(s)
+                    \big]
+                    &=
+                    \sfrac{1}{\sigma y \sqrt{2\pi\tau}}
+                    \int_{0}^{\infty}
+                    f(y)
+                    \exp\left\{
+                        - \sfrac{
+                            [ \sigma^{-1} ( \ln y - \ln S(s) - \nu\tau ]^2
+                        }{
+                            2 \tau
+                        }
+                    \right\}
+                    \, \text{d} y
+                    \\
+                    %
+                    %
+                    &=
+                    \sfrac{1}{\sigma y \sqrt{2\pi\tau}}
+                    \int_{0}^{\infty}
+                    f(y)
+                    \exp\left\{
+                        -\sfrac{
+                            (\ln (\nicefrac{y}{S(s)}) - \nu\tau)^2
+                        }{
+                            2 \tau \sigma^2
+                        }
+                    \right\}
+                    \, \text{d} y.
+                \end{aligned}
+            \]
+            Taking $x = S(s)$, we see that $S$ indeed satisfies the Markov property, with
+            $p(\tau, x, y)$ as its transition density.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 7
+    \begin{hwquestion}
+        Theorem 3.6.2 provides the Laplace transform of the density of the first passage
+        time for Brownian motion. This problem derives the analogous formula for Brownian
+        motions with drift. Let $W$ be a Brownian motion. Fix $m > 0$ and $\mu \in \R$. For
+        $0 \leq t < \infty$, define
+        \[
+            X(t) = \mu t + W(t),
+            \qquad \text{ and } \qquad
+            \tau_{m}
+            =
+            \min \{
+                t \geq 0 \, | \, X(t) = m
+            \}.
+        \]
+        As usual, we set $\tau_{m} = \infty$ if $X(t)$ never reaches the level $m$. Let
+        $\sigma$ be a positive number and set
+        \[
+            Z(t)
+            =
+            \exp\left\{
+                \sigma X(t) - \left( \sigma\mu + \sfrac{1}{2}\sigma^2 \right) t
+            \right\}.
+        \]
+
+        \begin{enumerate}[(i), nolistsep]
+            \item Show that $Z(t), t \geq 0$, is a martingale.
+
+            \item Use (i) to conclude that
+            \[
+                \E\left[
+                    \exp\left\{
+                        \sigma X(t \wedge \tau_{m})
+                        -
+                        \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right)(t \wedge \tau_{m})
+                    \right\}
+                \right]
+                =
+                1,
+                \qquad t \geq 0.
+            \]
+
+            \item Now suppose $\mu \geq 0$. Show that, for $\sigma > 0$,
+            \[
+                \E\left\{
+                    \exp\left[
+                        \sigma m
+                        -
+                        \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right) \tau_{m}
+                    \right] \bm{1}[\tau_{m} < \infty]
+                \right\}
+                =
+                1.
+            \]
+            Use this fact to show $\P(\tau_m < \infty) = 1$ and to obtain the Laplace
+            transform
+            \[
+                \E\left[
+                    e^{-\alpha\tau_{m}}
+                \right]
+                =
+                \exp\left(
+                    m \mu - m \sqrt{2\alpha + \mu^2}
+                \right)
+                \qquad \text{ for all } \qquad
+                \alpha > 0.
+            \]
+            
+            \item Show that if $\mu > 0$, then $\E[\tau_{m}] < \infty$. Obtain a formula
+            for $\E[\tau_{m}]$.
+
+            \item Now suppose $\mu < 0$. Show that, for $\sigma > -2\mu$,
+            \[
+                \E\left\{
+                    \exp\left[
+                        \sigma m
+                        -
+                        \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right) \tau_{m}
+                    \right] \bm{1}[\tau_{m} < \infty]
+                \right\}
+                =
+                1.
+            \]
+            Use this fact to show that $\P(\tau_{m} < \infty) = e^{-2m|\mu|}$, which is
+            strictly less than one, and to obtain the Laplace transform
+            \[
+                \E\left[
+                    e^{-\alpha\tau_{m}}
+                \right]
+                =
+                \exp\left(
+                    m \mu - m \sqrt{2\alpha + \mu^2}
+                \right)
+                \qquad \text{ for all } \qquad
+                \alpha > 0.
+            \]
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        Recall that $x \wedge y = \min\{ x, y \}$.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i)]
+            \item We begin this proof in the usual way: write $Z(t)$ as $\big(Z(t) Z(s)^{-1}
+            \big) Z(s)$, factor the second term out of the conditional expectation, and rely
+            on the independence of $W(t) - W(s)$ (and thus functions of that difference, 
+            although we are jumping the gun a bit by not being rigorous on this point) and
+            $\cF(s)$:
+            \[
+                \E\big[
+                    Z(t)
+                    \, | \, 
+                    \cF(s)
+                \big]
+                =
+                Z(s) \E\big[
+                    Z(t) Z(s)^{-1}
+                    \, | \,
+                    \cF(s)
+                \big]
+                =
+                Z(s) \E\big[
+                    Z(t) Z(s)^{-1}
+                \big]
+            \]
+            Then, because
+            \[
+                \begin{aligned}
+                    Z(t) Z(s)^{-1}
+                    &=
+                    \exp\left\{
+                        \sigma \big( X(t) - X(s) \big)
+                        -
+                        \left(\sigma \mu + \sfrac{1}{2}\sigma^2 \right)(t-s)
+                    \right\}
+                    \\
+                    %
+                    %
+                    &=
+                    \exp\left\{
+                        \sigma \big( W(t) - W(s) \big)
+                        -
+                        \sfrac{1}{2}\sigma^2 (t - s)
+                    \right\},
+                \end{aligned}
+            \]
+            we have
+            \[
+                \E\big[
+                    Z(t) \, \big| \, \cF(s)
+                \big]
+                =
+                Z(s) e^{-\frac{1}{2}\sigma^2(t-s)}
+                \E\left[
+                    e^{\sigma(W(t) - W(s))}
+                \right].
+            \]
+            The final expectations term above is the moment-generating function of the
+            $N(0, t - s)$ random variable $W(t) - W(s)$ evaluated at $\sigma$, so that
+            \[
+                \E\big[
+                    Z(t) \, \big| \, \cF(s)
+                \big]
+                =
+                Z(s) e^{-\frac{1}{2}\sigma^2(t-s)}
+                e^{\frac{1}{2}\sigma^2(t-s)}
+                =
+                Z(s),
+            \]
+            as desired.
+
+            \item The optional stopping theorem states that $\E[Z(t \wedge \tau_{m})] =
+            \E[Z(0)] = 1$. Thus
+            \[
+                \E\big[
+                    Z(t \wedge \tau_{m})
+                \big]
+                =
+                \E\left[
+                    \exp\left\{
+                        \sigma X(t \wedge \tau_{m})
+                        -
+                        \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right)(t \wedge \tau_{m})
+                    \right\}
+                \right]
+                =
+                1,
+                \qquad t \geq 0.
+            \]
+            
+            \vspace{2mm}
+
+            Another route to showing this that does not rely on a direct appeal to the
+            optional stopping theorem goes as follows. Since $m > 0$, $\tau_{m}$ is strictly
+            greater than zero, although it can be arbitrarily close for sufficiently small
+            $m$ (this follows from the fact that $W$, and thus $X$ and $Z$, are continuous
+            with respect to time). If $t = 0$, then $t \wedge \tau_{m} = 0$ and $\E[Z(t
+            \wedge \tau_{m})] = \E[Z(0)] = 1$. If instead $t > 0$, then $Z(t \wedge
+            \tau_{m})$ is independent of the sub-$\sigma$-algebra $\cF(0)$ so that $\E[Z(t
+            \wedge \tau_{m}) | \, | \, \cF(0)] = \E[Z(t \wedge \tau_{m})]$. As $Z$ is a
+            martingale (see (i)),
+            \[
+                \E\big[
+                    Z(t \wedge \tau_{m})
+                \big]
+                =
+                \E\big[
+                    Z(t \wedge \tau_{m})
+                    \, | \,
+                    \cF(0)
+                \big]
+                =
+                Z(0)
+                =
+                1.
+            \]
+
+            \item With $\mu \geq 0$ and $\sigma > 0$, the term $-(\sigma \mu + \nicefrac{
+            \sigma^2}{2}) t$ is guaranteed to be negative. Thus $Z(t) \leq e^{\sigma X(t)}$
+            for all $t$, and moreover for all $t \in [0, \tau_{m}]$ we have that $Z(t) \leq
+            e^{\sigma m}$, since $X(t) \leq m$ for all such $t$.
+
+            If the stopping time $\tau_{m}$ is finite, then
+            \[
+                \lim_{t \to \infty}
+                Z(t \wedge \tau_{m})
+                =
+                Z(\tau_{m})
+                =
+                \exp\left\{
+                    \sigma m - \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right) \tau_{m}
+                \right\}
+            \].
+            If instead $\tau_{m}$ is infinite, then $0 \leq Z(t) \leq e^{\sigma X(t)} \leq
+            e^{\sigma m}$ as $t \to\infty$, as noted above. Thus in the limit, $Z(t)$ is
+            bounded, as shown below,
+            \[
+                \lim_{t \to \infty}
+                Z(t)
+                =
+                \lim_{t \to \infty}
+                e^{\sigma X(t)}
+                \lim_{t \to \infty}
+                \exp\left\{
+                    - \left( \sigma \mu + \sfrac{1}{2}\sigma^2 \right) t
+                \right\}
+                \leq
+                e^{\sigma m}
+                \times
+                0
+                =
+                0
+            \]
+            We can harmonize these two cases by adding a term that indicates whether or not
+            $X$ reaches level $m$:
+            \[
+                \lim_{t \to \infty}
+                Z(t \wedge \tau_{m})
+                =
+                \exp\left\{
+                    \sigma m - \left(\sigma \mu + \sfrac{1}{2} \sigma^2 \right) \tau_{m}
+                \right\}
+                \bm{1}[\tau_{m} < \infty]
+            \]
+            Hence by the bounded convergence theorem, we can interchange the limit and
+            expectation operator to conclude
+            \[
+                \begin{aligned}
+                    \E\left\{
+                        \exp\left[
+                            \sigma m - \left(\sigma\mu + \sfrac{1}{2}\sigma^2\right) \tau_m
+                        \right]
+                        \bm{1}[\tau_{m} < \infty]
+                    \right\}
+                    &=
+                    \E\left\{
+                        \lim_{t \to \infty}
+                        Z(t \wedge \tau_{m})
+                    \right\}
+                    \\
+                    %
+                    %
+                    &=
+                    \lim_{t \to \infty}
+                    \E\left[ Z(t \wedge \tau_{m}) \right]
+                    =
+                    \lim_{t \to \infty} 1
+                    =
+                    1.
+                \end{aligned}
+            \]
+            The second-to-last equality uses the result from (ii).
+
+            As $\sigma \downarrow 0$, $\exp\left[ \sigma m - (\sigma \mu + \nicefrac{
+            \sigma^2}{2}) \tau_m \right]$ converges to one. Thus
+            \[
+                \begin{aligned}
+                    1
+                    =
+                    \lim_{\sigma \downarrow 0}
+                    \E\left\{
+                        \exp\left[
+                            \sigma m - \left(\sigma\mu + \sfrac{1}{2}\sigma^2\right) \tau_m
+                        \right]
+                        \bm{1}[\tau_{m} < \infty]
+                    \right\}
+                    &=
+                    \E\left\{
+                        \bm{1}[\tau_{m} < \infty]
+                    \right\}
+                    \\
+                    %
+                    %
+                    &=
+                    \P(\tau_{m} < \infty).
+                \end{aligned}
+            \]
+            Since $\tau_{m}$ is finite almost surely, we can drop the indicator function in
+            what follows. Factoring out the constant $e^{-\sigma m}$ from the expectation
+            yields
+            \[
+                \E\left\{
+                    \exp\left[
+                        -\left(\sigma \mu + \sfrac{1}{2}\sigma^2 \right) \tau_{m}
+                    \right]
+                \right\}
+                =
+                e^{-\sigma m},
+            \]
+            prompting us to define $\alpha = \sigma \mu + \nicefrac{\sigma^2}{2} > 0$, so
+            that $\sigma = - \mu + \sqrt{2 \alpha + \mu^2}$. Thus, $\E[ e^{-\alpha \tau_m} ]
+            = e^{m \mu - m \sqrt{2 \alpha + \mu^2}}$ for all $\alpha$, as desired.
+
+            \item Take the derivative of the equality in part (iii) with respect to $\alpha$
+            and use the dominated convergence theorem to exchange the derivative and
+            expectations operators:
+            \[
+                \sfrac{\text{d}}{\text{d} \alpha} \left\{
+                    \E\left[ e^{-\alpha \tau_{m}} \right]
+                \right\}
+                =
+                \E\left[
+                    \sfrac{\text{d}}{\text{d} \alpha} \left\{
+                        e^{-\alpha \tau_{m}}
+                    \right\}
+                \right]
+                =
+                -
+                \E \left[
+                    \tau_{m}
+                    e^{-\alpha \tau_{m}}
+                \right]
+                =
+                -\frac{
+                    m
+                }{
+                    \sqrt{2 \alpha + \mu^2}
+                }
+                e^{m\mu - m \sqrt{2 \alpha + \mu^2}}.
+            \]
+            Next we take the limit $\alpha \downarrow 0$:
+            \[
+                \lim_{\alpha \downarrow 0}
+                \E \left[
+                    \tau_{m} e^{-\alpha \tau_{m}}
+                \right]
+                =
+                \E \left[
+                    \lim_{\alpha \downarrow 0}
+                    \tau_{m} e^{-\alpha \tau_{m}}
+                \right]
+                =
+                \E [\tau_{m}]
+                =
+                \sfrac{m}{\mu}.
+            \]
+            We assumed $\mu > 0$, guaranteeing this expectation is finite. 
+
+            \item The assumptions that $\mu < 0$ and $\sigma > -2\mu$ imply $\sigma \mu +
+            \nicefrac{\sigma^2}{2} > 0$. Thus we can follow many of the same steps as in
+            part (ii) to answer this question.
+
+            It is still the case that for $t \in [0, \tau_{m}]$, $e^{\sigma X(t)}$ is
+            bounded above by $e^{\sigma m}$, so that $\lim_{t \to \infty} e^{\sigma X(t)}$
+            is bounded above whether or not $\tau_{m}$ is infinite. Furthermore, because
+            $\sigma \mu + \nicefrac{\sigma^2}{2} > 0$, when $\tau_{m}$ is infinite,
+            \[
+                \lim_{t \to \infty}
+                \exp\left\{
+                    - \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right) (t \wedge \tau_{m})
+                \right\}
+                =
+                \lim_{t \to \infty}
+                \exp\left\{
+                    - \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right) t
+                \right\}
+                =
+                0.
+            \]
+            Hence we can use all the same monotone convergence arguments as in part (ii)
+            to conclude
+            \[
+                \E\left\{
+                    \exp\left[
+                        \sigma m
+                        -
+                        \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right) \tau_{m}
+                    \right] \bm{1}[\tau_{m} < \infty]
+                \right\}
+                =
+                1.
+            \]
+
+            Where we depart from part (iii)'s path is here: because $\sigma > -2 \mu$, we
+            cannot take the limit $\sigma \downarrow 0$ as before. Instead, consider taking
+            the limit of the above expression as $\sigma \downarrow -2 \mu$:
+            \[
+                \begin{aligned}
+                    1
+                    &= 
+                    \lim_{\sigma \downarrow -2\mu}
+                    \E \left\{
+                        \exp\left[
+                            \sigma m - \left( \sigma \mu + \sfrac{1}{2} \sigma^2 \right)
+                            \tau_{m}
+                        \right]
+                        \bm{1}[\tau_{m} < \infty]
+                    \right\}
+                    \\
+                    %
+                    %
+                    &=
+                    \E \left\{
+                        \exp\left[
+                            -2 m \mu - \left( -2\mu^2 + \sfrac{1}{2}(4 \mu^2) \right)
+                            \tau_{m}
+                        \right]
+                        \bm{1}[\tau_{m} < \infty]
+                    \right\}
+                    \\
+                    %
+                    %
+                    &=
+                    \E \left\{
+                        e^{-2 m \mu}
+                        \bm{1}[\tau_{m} < \infty]
+                    \right\}.
+                \end{aligned}
+            \]
+            Moving the constant $e^{-2 m \mu}$ term to the other side of the equation, we
+            have that $\P(\tau_{m} < \infty) = e^{2 m \mu} = e^{-2 m |\mu|}$.
+
+            As before we define $\alpha = \sigma \mu + \nicefrac{\sigma^2}{2}$ to derive
+            the Laplace expression.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    % question 8
+    \begin{hwquestion}
+        This problem presents the convergence of the distribution of stock prices in a
+        sequence of binomial models to the distribution of geometric Brownian motion. In
+        contrast to the analysis of Subsection 3.2.7, here we allow the interest rate to be
+        different from zero.
+
+        Let $\sigma > 0$ and $r \geq 0$ be given. For each positive integer $n$, we consider
+        a binomial model taking $n$ steps per unit time. In this model, the interest rate
+        per period is $\nicefrac{r}{n}$, the up factor is $u_n = e^{\sigma/\sqrt{n}}$, and
+        the down factor is $d_n = e^{-\sigma/\sqrt{n}}$. The risk-neutral probabilities are
+        then
+        \[
+            \tilde{p}_n
+            =
+            \frac{
+                \nicefrac{r}{n} + 1 - e^{-\sigma/\sqrt{n}}
+            }{
+                e^{\sigma/\sqrt{n}} - e^{-\sigma/\sqrt{n}}
+            }
+            \quad \text{and} \quad
+            \tilde{q}_n
+            =
+            \frac{
+                e^{\sigma/\sqrt{n}} - \nicefrac{r}{n} - 1
+            }{
+                e^{\sigma/\sqrt{n}} - e^{-\sigma/\sqrt{n}}
+            }
+        \]
+        Let $t$ be an arbitrary positive rational number, and for each positive integer $n$
+        for which $nt$ is an integer, define
+        \[
+            M_{nt, n}
+            =
+            \sum_{k=1}^{nt}
+            X_{k,n},
+        \]
+        where $X_{1,n}, \dots, X_{n,n}$ are independent, identically distributed random
+        variables with
+        \[
+            \widetilde{\P}(X_{k,n} = 1) = \tilde{p}_n,
+            \qquad
+            \widetilde{\P}(X_{k,n} = -1) = \tilde{q}_n,
+            \qquad
+            k = 1, \dots, n.
+        \]
+        The stock price at time $t$ in this binomial model, which is the result of $nt$
+        steps from the initial time, is given by
+        \[
+            \begin{aligned}
+                S_n(t)
+                &=
+                S(0) u_n^{\frac{1}{2}(nt+M_{nt,n})} d_n^{\frac{1}{2}(nt-M_{nt,n})} \\
+                %
+                %
+                &=
+                S(0) \exp\left\{
+                    \sfrac{\sigma}{2\sqrt{n}}
+                    (nt + M_{nt,n})
+                \right\}
+                \exp\left\{
+                    -\sfrac{\sigma}{2\sqrt{n}}
+                    (nt - M_{nt,n})
+                \right\} \\
+                %
+                %
+                &=
+                S(0) \exp\left\{
+                    \sfrac{\sigma}{\sqrt{n}}
+                    M_{nt,n}
+                \right\}.
+            \end{aligned}
+        \]
+        This problem shows that as $n \to \infty$, the distribution of the sequence of
+        random variables $(\nicefrac{\sigma}{\sqrt{n}}) M_{nt,n}$ appearing in the exponent
+        above converges to the normal distribution with mean $(r - \nicefrac{\sigma^2}{2})t$
+        and variance $\sigma^2 t$. Therefore, the limiting distribution of $S_n(t)$ is the
+        same as the distribution of the geometric Brownian motion $S(0) \exp\left\{\sigma
+        W(t) + (r-\nicefrac{\sigma^2}{2})t\right\}$ at time $t$.
+
+        \vspace{2mm}
+        
+        \begin{enumerate}[(i), nolistsep]
+            \item Show that the moment-generating function $\varphi_{n}(u)$ of $n^{-1/2}
+            M_{nt,n}$ is given by
+            \[
+                \varphi_{n}(u)
+                =
+                \left[
+                    e^{u/\sqrt{n}}
+                    \left(
+                        \frac{
+                            \nicefrac{r}{n} + 1 - e^{-\sigma/\sqrt{n}}
+                        }{
+                            e^{\sigma/\sqrt{n}} - e^{-\sigma/\sqrt{n}}
+                        }
+                    \right)
+                    +
+                    e^{-u/\sqrt{n}}
+                    \left(
+                        \frac{
+                            \nicefrac{r}{n} + 1 - e^{\sigma/\sqrt{n}}
+                        }{
+                            e^{\sigma/\sqrt{n}} - e^{-\sigma/\sqrt{n}}
+                        }
+                    \right)
+                \right]^{nt}.
+            \]
+
+            \item We want to compute
+            \[
+                \lim_{n \to \infty}
+                \varphi_{n}(u)
+                =
+                \lim_{x \downarrow 0}
+                \varphi_{1/x^2}(u),
+            \]
+            where we have made the change of variable $x = n^{-1/2}$. To do this, we will
+            compute $\log \varphi_{1/x^2}(u)$ and then take the limit as $x \downarrow 0$.
+            Show that
+            \[
+                \log \varphi_{1/x^2}(u)
+                =
+                \sfrac{t}{x^2}
+                \log \left[
+                    \frac{
+                        (rx^2 + 1) \sinh (ux) + \sin[(\sigma-u)x]
+                    }{
+                        \sinh(\sigma x)
+                    }.
+                \right]
+            \]
+            The definitions are $\sinh z = (\nicefrac{1}{2})(e^{z} - e^{-z})$ and $\cosh z
+            = (\nicefrac{1}{2})(e^{z} + e^{-z})$. Use the formula
+            \[
+                \sinh(A - B)
+                =
+                \sinh A \cosh B
+                -
+                \cosh A \sinh B
+            \]
+            to rewrite this as
+            \[
+                \log \varphi_{1/x^2}(u)
+                =
+                \sfrac{t}{x^2}
+                \log \left[
+                    \cosh(ux)
+                    +
+                    \frac{
+                        (rx^2 + 1 - \cosh(\sigma x)) \sinh(ux)
+                    }{
+                        \sinh(\sigma x)
+                    }
+                \right]
+            \].
+            
+            \item Use the Taylor series expansions
+            \[
+                \cosh z
+                =
+                1 + \sfrac{1}{2} z^2 + O(z^4),
+                \quad \text{ and } \quad
+                \sinh z
+                =
+                z + O(z^3),
+            \]
+            to show that
+            \[
+                \cosh(ux)
+                +
+                \frac{
+                    (rx^2 + 1 - \cosh(\sigma x)) \sinh(ux)
+                }{
+                    \sinh(\sigma x)
+                }
+                =
+                1 + \sfrac{1}{2} u^2 x^2 +
+                \sfrac{rux^2}{\sigma} - \sfrac{1}{2} u x^2 \sigma + O(x^4).
+            \]
+            The notation $O(x^j)$ is used to represent terms of the order $x^j$.
+
+            \item Use the Taylor series expansion $\log(1 + x) = x + O(x^2)$ to compute
+            $\lim_{x \downarrow 0} \log \varphi_{1/x^2}(u)$. Now explain how you know that
+            the limiting distribution for $(\nicefrac{\sigma}{\sqrt{n}}) M_{nt,n}$ is normal
+            with mean $(r - \nicefrac{\sigma^2}{2}) t$ and variance $\sigma^2 t$.
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item The moment-generating function for any of the $X_{k,n}$ random variables
+            is
+            \[
+                \varphi_{X,n}(u)
+                =
+                \E\big[ e^{u X_{k,n}} \big]
+                =
+                e^{u} \tilde{P}(X_{k,n} = 1)
+                +
+                e^{-u} \tilde{P}(X_{k,n} = -1)
+                =
+                e^{u} \tilde{p}_n
+                +
+                e^{-u} \tilde{q}_n.
+            \]
+            Recall that if $\varphi_Y(u)$ is the moment-generating function for a random
+            variable $Y$, then the moment-generating function for the random variable $aY
+            + b$ with constants $a$ and $b$ is $\varphi_{aY+b}(u) = e^{bu} \varphi_{Y}(au)$.
+            Thus, the moment-generating function of $n^{-1/2} X_{k,n}$ is
+            \[
+                \varphi_{n^{-1/2} X, n}(u)
+                =
+                e^{u/\sqrt{n}} \tilde{p}_n
+                +
+                e^{-u/\sqrt{n}} \tilde{p}_n.
+            \]
+            Recall also the moment-generating function of a sum of independent random
+            variables is the product of the the moment-generating functions of the
+            individual random variables. Thus, the moment-generating function of $n^{-1/2}
+            M_{nt,n} = \sum_{k} n^{-1/2} X_{k,n}$ is indeed
+            \[
+                \varphi_{n}(u)
+                =
+                \prod_{k=1}^{nt}
+                \varphi_{n^{-1/2} X, n}(u)
+                =
+                \varphi_{n^{-1/2} X, n}(u)^{nt}
+                =
+                \left(
+                    e^{u/\sqrt{n}} \tilde{p}_n + e^{-u/\sqrt{n}} \tilde{q}_n
+                \right)^{nt},
+            \]
+            so we are done.
+
+            \item With the change of variable $x = n^{-1/2}$, the risk-neutral probabilities
+            are
+            \[
+                \tilde{p}_{1/x^2}
+                =
+                \frac{
+                    r x^2 + 1 - e^{-\sigma x}
+                }{
+                    e^{\sigma x} - e^{-\sigma x}
+                }
+                \quad \text{ and } \quad
+                \tilde{q}_{1/x^2}
+                =
+                \frac{
+                    e^{\sigma x} - r x^2 - 1
+                }{
+                    e^{\sigma x} - e^{-\sigma x}
+                }.
+            \]
+            Note the denominator of each of the probabilities is $2 \sinh(\sigma x)$. The
+            up and down factors are $e^{ux}$ and $e^{-ux}$ respectively. The numerator
+            of the expression $e^{ux} \tilde{p}_{1/x^2} + e^{-ux} \tilde{q}_{1/x^2}$ is
+            \[
+                \begin{multlined}
+                    e^{ux} \left( r x^2 + 1 - e^{-\sigma x} \right)
+                    +
+                    e^{-ux} \left( e^{\sigma x} - r x^2 - 1\right)
+                    \\
+                    %
+                    %
+                    =
+                    \left(
+                        e^{ux} - e^{-ux}
+                    \right)
+                    (r x^2 + 1)
+                    +
+                    e^{(\sigma - u)x} - e^{-(\sigma-u)x}
+                \end{multlined}
+            \]
+            which is equal to $2 \sinh(ux)(r x^2 + 1) + 2 \sinh\big( (\sigma-u) x \big)$.
+            Thus,
+            \[
+                e^{ux} p_{1/x^2} + e^{-ux} q_{1/x^2}
+                =
+                \frac{
+                    \sinh(ux)(r x^2 + 1) + \sinh\big( (\sigma-u) x \big)
+                }{
+                    \sinh(\sigma x)
+                }.
+            \]
+            Taking logs of $\varphi_{n}(u) = \varphi_{1/x^2}(u)$ yields the first desired
+            equality.
+
+            Applying the identity $\sinh(A - B) = \sinh A \cosh B - \cosh A \sinh B$ to the
+            $\sinh\big( (\sigma - u) x \big) = \sinh(\sigma x - u x)$ term in the numerator,
+            we have
+            \[
+                \begin{multlined}
+                    \sinh(ux)(r x^2 + 1) + \sinh\big( (\sigma-u) x \big)
+                    \\
+                    %
+                    %
+                    =
+                    \sinh(\sigma x) \cosh(ux)
+                    +
+                    \big[
+                        r x^2 + 1 - \cosh(\sigma x)
+                    \big]
+                    \sinh(ux)
+                \end{multlined}
+            \]
+            Thus,
+            \[
+                \log \varphi_{1/x^2}(u)
+                =
+                \sfrac{t}{x^2}
+                \log \left[
+                    \cosh(ux)
+                    +
+                    \frac{
+                        (r x^2 + 1 - \cosh(\sigma x))
+                        \sinh(ux)
+                    }{
+                        \sinh(\sigma x)
+                    }
+                \right].
+            \]
+
+            \item Using the Taylor series expansion $\cosh z = 1 + \nicefrac{z^2}{2} +
+            O(z^4)$, we can write
+            \[
+                r x^2 + 1 - \cosh(\sigma x)
+                \quad \text{ as } \quad
+                r x^2 + \sfrac{1}{2} \sigma^2 x^2 + O(x^4).
+            \]
+            Multiply this by $\sinh(z) = z + O(z^4)$ with $z = u x$ to derive
+            \[
+                \big( r x^2 + 1 - \cosh(\sigma x) \big)
+                \sinh(ux)
+                =
+                r u x^3 + \sfrac{1}{2} \sigma^2 u x^3 + O(x^5),
+            \]
+            then divide by $\sinh(\sigma x)$ to arrive at
+            \[
+                \frac{
+                    \big( r x^2 + 1 - \cosh(\sigma x) \big)
+                    \sinh(ux)
+                }{
+                    \sinh(\sigma x)
+                }
+                =
+                \sfrac{r u}{\sigma} x^2
+                +
+                \sfrac{1}{2} \sigma u x^2 + O(x^4).
+            \]
+            Finally we add $\cosh(u x)$ to create the desired expression
+            \[
+                \cosh(u x)
+                +
+                \frac{
+                    \big( r x^2 + 1 - \cosh(\sigma x) \big)
+                    \sinh(ux)
+                }{
+                    \sinh(\sigma x)
+                }
+                =
+                1 + \sfrac{1}{2} u^2 x^2 + \sfrac{r u}{\sigma} x^2 -
+                \sfrac{1}{2} \sigma u x^2 + O(x^4).
+            \]
+
+            \item We follow the instructions to write
+            \[
+                \begin{aligned}
+                    \log \varphi_{1/x^2}(u)
+                    &=
+                    \sfrac{t}{x^2}
+                    \log\left[
+                        1 + \sfrac{1}{2} u^2 x^2 + \sfrac{r u}{\sigma} x^2 -
+                        \sfrac{1}{2} \sigma u x^2
+                    \right]
+                    \\
+                    %
+                    %
+                    &=
+                    \sfrac{t}{x^2}
+                    \left(
+                        \sfrac{1}{2} u^2 x^2 + \sfrac{r u}{\sigma} x^2 -
+                        \sfrac{1}{2} \sigma u x^2
+                        +
+                        O({x^2}^2)
+                    \right)
+                    \\
+                    %
+                    %
+                    &=
+                    \sfrac{t}{2} u^2 +
+                    \left(
+                        \sfrac{rt}{\sigma} - \sfrac{\sigma t}{2}
+                    \right)
+                    u
+                    + O(x^2)
+                \end{aligned}
+            \]
+            Taking the limit as $x \downarrow 0$, we have
+            \[
+                \log \varphi_{1/x^2}(u)
+                =
+                \sfrac{t}{2} u^2
+                +
+                t \left( \sfrac{r}{\sigma} - \sfrac{\sigma}{2} \right) u
+                %
+                \iff
+                %
+                \varphi_{1/x^2}(u)
+                =
+                \exp\left[
+                    \sfrac{t}{2} u^2
+                    +
+                    t \left( \sfrac{r}{\sigma} - \sfrac{\sigma}{2} \right) u
+                \right]
+            \]
+            This last expression is precisely the moment-generating function for a Gaussian
+            random variable with mean $t (\nicefrac{r}{\sigma} - \nicefrac{\sigma}{2})$ and
+            variance $t$; this is the distribution of $n^{-1/2} M_{nt,n}$. Multiplying this
+            random variable by $\sigma$, we see that $\sigma n^{-1/2} M_{nt,n}$ is also a
+            Gaussian variable, with mean $t (r - \nicefrac{\sigma^2}{2})$ and variance
+            $\sigma^2 t$.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+    %-- question 9
+    \begin{hwquestion}[Laplace Transform of the First Passage Density]
+        Let $m > 0$ be given, and define
+        \[
+            f(t, m)
+            =
+            \sfrac{m}{t \sqrt{2 \pi t}}
+            \exp\left\{
+                - \sfrac{m^2}{2t}
+            \right\}.
+        \]
+        According to (3.7.3) in Theorem 3.7.1, $f(t, m)$ is the density in the variable $t$
+        of the first passage time $\tau_{m} = \min \{ t \geq 0 \, | \, W(t) = m \}$, where
+        $W$ is a Brownian motion without drift. Let
+        \[
+            g(\alpha, m)
+            =
+            \int_{0}^{\infty}
+            e^{-\alpha t}
+            f(t, m) \, \text{d} t,
+            \qquad
+            \alpha > 0,
+        \]
+        be the Laplace transform of the density $f(t, m)$. This problem verifies that $g(
+        \alpha, m) = e^{-m\sqrt{2\alpha}}$, which is the formula drived in Theorem 3.6.2.
+
+        \vspace{2mm}
+
+        \begin{enumerate}[(i), nolistsep]
+            \item For $k \geq 1$, define
+            \[
+                a_k(m)
+                =
+                \sfrac{1}{\sqrt{2\pi}}
+                \int_{0}^{\infty}
+                t^{-k/2} \exp\left\{-\alpha t - \sfrac{m^2}{2t}\right\}
+                ,
+                \text{d} t,
+            \]
+            so that $g(\alpha, m) = m a_3(m)$. Show that
+            \[
+                \begin{aligned}
+                    g_m(\alpha, m) &= a_3(m) - m^2 a_5(m), \\
+                    g_{mm}(\alpha, m) &= -3ma_5(m) + m^3 a_7(m)
+                \end{aligned}.
+            \]
+
+            \item Use integration by parts to show that
+            \[
+                a_5(m)
+                =
+                -\sfrac{2\alpha}{3} a_3(m) + \sfrac{m^2}{3} a_7(m).
+            \]
+
+            \item Use (i) and (ii) to show that $g$ satisfies the second-order ordinary
+            differential equation
+            \[
+                g_{mm}(\alpha, m) = 2 \alpha g(\alpha, m).
+            \]
+
+            \item The general solution to a second-order ordinary differential equation of
+            the form
+            \[
+                a y''(m) + b y'(m) + c y(m) = 0
+            \]
+            is
+            \[
+                y(m) = A_{1} e^{\lambda_1 m} + A_2 e^{\lambda_2 m},
+            \]
+            where $\lambda_1$ and $\lambda_2$ are roots of the \emph{characteristic
+            equation}
+            \[
+                a \lambda^2 + b \lambda + c = 0.
+            \]
+            here we are assuming that these roots are distinct. Find the general solution of
+            the equation in (iii) when $\alpha > 0$. This solution has two undetermined
+            parameters $A_1$ and $A_2$, and these may depend on $\alpha$.
+
+            \item Derive the bound
+            \[
+                g(\alpha, m)
+                \leq
+                \sfrac{m}{\sqrt{2\pi}}
+                \int_{0}^{m}
+                \sqrt{\sfrac{m}{t}}
+                t^{-3/2}
+                \exp\left\{
+                    -\sfrac{m^2}{2t}
+                \right\}
+                \, \text{d} t
+                +
+                \sfrac{1}{\sqrt{2\pi m}}
+                \int_{m}^{\infty}
+                e^{-\alpha t}
+                \, \text{d} t
+            \]
+            and use it to show that, for every $\alpha > 0$,
+            \[
+                \lim_{m \uparrow \infty} g(\alpha, m) = 0.
+            \]
+            Use this fact to determine one of the parameters in the general solution to the
+            equation in (iii).
+
+            \item Using first the change of variable $s = \nicefrac{t}{m^2}$ and then the
+            change of variable $y = \nicefrac{1}{\sqrt{s}}$, show that
+            \[
+                \lim_{m \downarrow 0} g(\alpha, m) = 1.
+            \]
+            Use this fact to determine the other parameter in the general solution to the
+            equation in (iii).
+        \end{enumerate}
+    \end{hwquestion}
+
+    \begin{hwanswer}
+        \begin{enumerate}[(i)]
+            \item Differentiating under the integral sign, we have
+            \[
+                \sfrac{\text{d}}{\text{d} m} \left[
+                    a_3(m)
+                \right]
+                =
+                \sfrac{1}{\sqrt{2\pi}}
+                \int_{0}^{\infty}
+                t^{-3/2} \left(\sfrac{-2m}{2t}\right)
+                \exp\left\{-\alpha t - \sfrac{m^2}{2t}\right\}
+                ,
+                \text{d} t,
+                =
+                -m a_{5}(m).
+            \]
+            Doing the same to $a_{5}(m)$, we have
+            \[
+                \sfrac{\text{d}}{\text{d} m} \left[
+                    a_5(m)
+                \right]
+                =
+                \sfrac{1}{\sqrt{2\pi}}
+                \int_{0}^{\infty}
+                t^{-5/2} \left(\sfrac{-2m}{2t}\right)
+                \exp\left\{-\alpha t - \sfrac{m^2}{2t}\right\}
+                ,
+                \text{d} t,
+                =
+                -m a_{7}(m).
+            \]
+            The product rule yields our desired answers straightaway:
+            \[
+                g_m(\alpha, m)
+                =
+                \sfrac{\text{d}}{\text{d} m}\left[
+                    m a_3(m)
+                \right]
+                =
+                a_3(m)
+                +
+                m
+                \sfrac{\text{d}}{\text{d} m}\left[
+                    a_3(m)
+                \right]
+                =
+                a_3(m) - m^2 a_3(m)
+            \]
+            and
+            \[
+                g_{mm}(\alpha, m)
+                =
+                -m a_5(m)
+                -
+                \left(
+                    2 m a_5(m)
+                    - 
+                    m^3 a_7(m)
+                \right)
+                =
+                - 3ma_5(m) +  m^3 a_7(m).
+            \]
+
+            \item We use integration by parts to reexpress $a_k(m)$ for $k \geq 3$, where
+            the restriction is in place to guarantee $k - 2 \geq 1$. Here,
+            \[
+                \sqrt{2\pi}
+                a_k(m)
+                =
+                \int_{0}^{\infty}
+                \underbrace{
+                    \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                }_{\equiv u}
+                \underbrace{
+                    t^{-k/2} \, \text{d} t
+                }_{\equiv \text{d} v}.
+            \]
+            Using integration by parts, we have
+            \[
+                \begin{aligned}
+                    \sqrt{2\pi}
+                    a_k(m)
+                    &=
+                    u v \big|_{t=0}^{t = \infty}
+                    -
+                    \int_{0}^{\infty} v \, \text{d} u
+                    \\
+                    %
+                    %
+                    &=
+                    \sfrac{2}{-k+2} t^{\frac{-k+2}{2}}
+                    \exp\left\{
+                        -\alpha t - \sfrac{m^2}{2t}
+                    \right\}
+                    \bigg|_{t = 0}^{t = \infty}
+                    \\
+                    %
+                    %
+                    &\qquad-
+                    \int_{0}^{\infty}
+                    \sfrac{2}{-k+2} t^{\frac{-k+2}{2}}
+                    \left( - \alpha + \sfrac{m^2}{2t^2} \right)
+                    \exp\left\{
+                        -\alpha t - \sfrac{m^2}{2t}
+                    \right\}
+                    \, \text{d} t
+                \end{aligned}
+            \]
+            The first term evaluates to $0 \times 0 - \infty \times 0 = 0$, and the integral
+            term on the right-hand side can be split into two:
+            \[
+                \sfrac{
+                    2 \alpha 
+                }{
+                    -k + 2
+                }
+                \int_{0}^{\infty}
+                t^{\frac{-k+2}{2}}
+                \exp\left\{
+                    -\alpha t - \sfrac{m^2}{2t}
+                \right\}
+                \, \text{d} t
+                -
+                \sfrac{
+                    m^2
+                }{
+                    -k + 2
+                }
+                \int_{0}^{\infty}
+                t^{\frac{-k+2}{2} - 2}
+                \exp\left\{
+                    -\alpha t - \sfrac{m^2}{2t}
+                \right\}
+                \, \text{d} t.
+            \]
+            Recognizing the first integral as $\sqrt{2\pi} a_{k-2}(m)$ and the second as
+            $\sqrt{2\pi} a_{k+2}(m)$, we have arrived at the identity
+            \[
+                a_k(m)
+                =
+                \sfrac{2\alpha}{-k + 2} a_{k-2}(m)
+                -
+                \sfrac{m^2}{-k + 2} a_{k+2}(m).
+            \]
+            Setting $k = 5$, we are done.
+
+            \item Substitute $a_5(m) = -\sfrac{2\alpha}{3} a_3(m) + \sfrac{m^2}{3} a_7(m)$
+            into $g_{mm}(\alpha, m) = -3ma_5(m) + m^3 a_7(m)$ to derive
+            \[
+                \begin{aligned}
+                    g_{mm}(\alpha, m)
+                    &=
+                    -3m \left[
+                        -\sfrac{2\alpha}{3} a_3(m)
+                        +
+                        \sfrac{m^2}{3} a_7(m)
+                    \right]
+                    +
+                    m^3 a_7(m)
+                    \\
+                    %
+                    %
+                    &=
+                    2 \alpha m a_3(m)
+                    -
+                    m^3 a_7(m)
+                    +
+                    m^3 a_7(m)
+                    =
+                    2 \alpha g(\alpha, m).
+                \end{aligned}
+            \]
+            The final equality follows from the identity $g(\alpha, m) = m a_3(m)$.
+
+            \item Comparing the identity $g_{mm}(\alpha, m) = 2 \alpha g(\alpha, m)$ from 
+            (iii) to the second-order differential equation in (iv), we see $a = 1$,
+            $b = 0$, and $c = - 2\alpha$. The roots of the characteristic equation are
+            \[
+                \lambda = \pm \sfrac{1}{2} \sqrt{ - 4 (1) (-2\alpha) }
+                =
+                \pm \sqrt{2 \alpha}.
+            \]
+            Thus, the general solution is given by
+            \[
+                y(m)
+                =
+                g(\alpha, m)
+                =
+                A_1 e^{-\sqrt{2\alpha} m}
+                +
+                A_2 e^{\sqrt{2\alpha} m},
+            \]
+            where $A_1$ and $A_2$ are yet to be determined.
+
+            \item Since $m, \alpha$, and $t$ are all non-negative, we have the following
+            inequalities:
+            \[
+                \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                \leq
+                \exp\left\{ -\sfrac{m^2}{2t} \right\}
+                \quad \text{ and } \quad
+                \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                \leq
+                e^{-\alpha t}.
+            \]
+            Furthermore, if $t \in (0, m]$,
+            \[
+                m t^{-3/2}
+                =
+                m \sqrt{\sfrac{t}{t}} t^{-3/2}
+                \leq
+                m \sqrt{\sfrac{m}{t}} t^{-3/2},
+            \]
+            and if instead $t \in (m, \infty)$, $m t^{-3/2} \leq m m^{-3/2} = m^{-1/2}$.
+
+            We have all the ingredients we need to derive the bound. First, partition the
+            integral in $g$'s definition as
+            \[
+                g(\alpha, m)
+                =
+                \int_{0}^{m}
+                \sfrac{m}{t \sqrt{2\pi t}}
+                \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                \, \text{d} t
+                +
+                \int_{m}^{\infty}
+                \sfrac{m}{t \sqrt{2\pi t}}
+                \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                \, \text{d} t
+            \]
+            From our inequalities above, the first integral is bounded above by
+            \[
+                \begin{aligned}
+                    \int_{0}^{m}
+                    \sfrac{m}{t \sqrt{2\pi t}}
+                    \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                    \, \text{d} t
+                    &\leq
+                    \int_{0}^{m}
+                    m \sqrt{\sfrac{m}{t}} t^{-3/2}
+                    \exp\left\{ -\sfrac{m^2}{2 t} \right\}
+                    \, \text{d} t
+                    \\
+                    %
+                    %
+                    &=
+                    \sfrac{m}{\sqrt{2\pi}}
+                    \int_{0}^{\infty}
+                    \sqrt{\sfrac{m}{t}} t^{-3/2}
+                    \exp\left\{ -\sfrac{m^2}{2 t} \right\}
+                    \, \text{d} t,
+                \end{aligned}
+            \]
+            which is precisely the first integral in the bound. Similarly, the second
+            integral in $g$'s partitioned definition bounded from above by
+            \[
+                \int_{m}^{\infty}
+                \sfrac{m}{t \sqrt{2\pi t}}
+                \exp\left\{ -\alpha t - \sfrac{m^2}{2t} \right\}
+                \, \text{d} t
+                \leq
+                \sfrac{1}{\sqrt{2\pi m}}
+                \int_{m}^{\infty}
+                e^{-\alpha t}
+                \, \text{d} t.
+            \]
+            Thus, we have established the given bound.
+        \end{enumerate}
+    \end{hwanswer}
+
+
+
+
+
+\end{document}
